@@ -37,3 +37,7 @@ FoodOrderingAppBackend-api/target/
 FoodOrderingAppBackend-db/target/
 
 FoodOrderingAppBackend-service/target/
+
+FoodOrderingApp-api/src/main/resources/application.yaml
+
+FoodOrderingApp-db/src/main/resources/config/localhost.properties
