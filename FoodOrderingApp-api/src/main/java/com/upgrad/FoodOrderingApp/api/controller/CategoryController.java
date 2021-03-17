@@ -52,7 +52,7 @@ public class CategoryController {
             value = "/category/{category_id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CategoryDetailsResponse> getCategoryDetails(@PathVariable("category_id") final String categoryId)
-            throws CategoryNotFoundException {
+     throws CategoryNotFoundException {
 
         //Throw exception if category is null
         if(categoryId == null) {
@@ -65,32 +65,31 @@ public class CategoryController {
             //Throw exception if there are no categories available by the id provided
             throw new CategoryNotFoundException( "CNF-002", "No category by this id");
         }
-        else {
-            //Get all items belong to this category
-            List<ItemEntity> items = itemBusinessService.getItemsForCategory(categoryId);
 
-            //Declare and initialize of CategoryDetailsResponse
-            CategoryDetailsResponse categoryDetailsResponse = new CategoryDetailsResponse();
-            UUID uuid = UUID.fromString(category.getUuid());
-            categoryDetailsResponse.setId(uuid);
-            categoryDetailsResponse.setCategoryName(category.getCategoryName());
-            final List<ItemList> itemLists = new ArrayList<>(items.size());
-            for (ItemEntity item : items) {
-                ItemList itemList = new ItemList();
-                UUID itemUuid = UUID.fromString(item.getUuid());
-                itemList.setId(itemUuid);
-                itemList.setItemName(item.getItemName());
-                itemList.setPrice(item.getPrice());
+        //Get all items belong to this category
+        List<ItemEntity> items = itemBusinessService.getItemsForCategory(categoryId);
 
-                //Convert type 0 & 1 value to ItemTypeEnum enum
-                String itemType = item.getType().equals("0") ? "VEG" : "NON_VEG";
-                itemList.setItemType(ItemList.ItemTypeEnum.fromValue(itemType));
+        //Declare and initialize of CategoryDetailsResponse
+        CategoryDetailsResponse categoryDetailsResponse = new CategoryDetailsResponse();
+        UUID uuid = UUID.fromString(category.getUuid());
+        categoryDetailsResponse.setId(uuid);
+        categoryDetailsResponse.setCategoryName(category.getCategoryName());
+        final List<ItemList> itemLists = new ArrayList<>(items.size());
+        for (ItemEntity item : items) {
+            ItemList itemList = new ItemList();
+            UUID itemUuid = UUID.fromString(item.getUuid());
+            itemList.setId(itemUuid);
+            itemList.setItemName(item.getItemName());
+            itemList.setPrice(item.getPrice());
 
-                itemLists.add(itemList);
-            }
-            categoryDetailsResponse.setItemList(itemLists);
+            //Convert type 0 & 1 value to ItemTypeEnum enum
+            String itemType = item.getType().equals("0") ? "VEG" : "NON_VEG";
+            itemList.setItemType(ItemList.ItemTypeEnum.fromValue(itemType));
 
-            return new ResponseEntity<CategoryDetailsResponse>(categoryDetailsResponse, HttpStatus.OK);
+            itemLists.add(itemList);
         }
+        categoryDetailsResponse.setItemList(itemLists);
+
+        return new ResponseEntity<CategoryDetailsResponse>(categoryDetailsResponse, HttpStatus.OK);
     }
 }
