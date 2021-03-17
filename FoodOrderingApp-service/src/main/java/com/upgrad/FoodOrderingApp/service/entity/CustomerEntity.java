@@ -7,15 +7,18 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Collection;
 
 @Entity
 @Table(name = "customer")
 @NamedQueries(
         {
                 @NamedQuery(name = "customerByContactNumber", query = "select u from CustomerEntity u where u.contact_number=:contact_number"),
+                @NamedQuery(name = "customerByFirstname", query = "select u from CustomerEntity u where u.firstname =:firstname"),
         }
 )
-public class CustomerEntity {
+public class CustomerEntity implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -124,4 +127,14 @@ public class CustomerEntity {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
 
+    @OneToMany(mappedBy = "customer")
+    private Collection<CustomerAuthTokenEntity> customerAuthTokenEntity;
+
+    public Collection<CustomerAuthTokenEntity> getCustomerAuthTokenEntity() {
+        return customerAuthTokenEntity;
+    }
+
+    public void setCustomerAuthTokenEntity(Collection<CustomerAuthTokenEntity> customerAuthTokenEntity) {
+        this.customerAuthTokenEntity = customerAuthTokenEntity;
+    }
 }
