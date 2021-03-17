@@ -9,6 +9,7 @@ import java.util.UUID;
 @NamedQueries(
         {
                 @NamedQuery(name = "allCategories", query = "select c from CategoryEntity c ORDER BY c.categoryName"),
+                @NamedQuery(name = "categoryDetails", query = "select c from CategoryEntity c where c.uuid=:categoryId")
         }
 )
 public class CategoryEntity {
