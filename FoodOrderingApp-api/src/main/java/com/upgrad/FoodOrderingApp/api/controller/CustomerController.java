@@ -1,13 +1,16 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.LoginResponse;
+import com.upgrad.FoodOrderingApp.api.model.LogoutResponse;
 import com.upgrad.FoodOrderingApp.api.model.SignupCustomerRequest;
 import com.upgrad.FoodOrderingApp.api.model.SignupCustomerResponse;
-import com.upgrad.FoodOrderingApp.service.businness.AuthenticationService;
+import com.upgrad.FoodOrderingApp.service.businness.LogoutBusinessService;
 import com.upgrad.FoodOrderingApp.service.businness.SignupBusinessService;
+import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthTokenEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
+import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Base64;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +34,10 @@ public class CustomerController {
     SignupBusinessService signupBusinessService;
 
     @Autowired
-    private AuthenticationService authenticationService;
+    private UtilityService utilityService;
+
+    @Autowired
+    private LogoutBusinessService logoutBusinessService;
 
     private boolean isEmailValid(String email) {
         String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
@@ -108,29 +113,35 @@ public class CustomerController {
     public ResponseEntity<LoginResponse> login(@RequestHeader("authorization") final String authorization)
             throws AuthenticationFailedException {
         // Basic authentication format validation
-        if (authorization != null && authorization.startsWith("Basic ")) {
-            byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
-            String decodeText = new String(decode);
-            String[] decodeArray = decodeText.split(":");
+        CustomerAuthTokenEntity customerAuthToken = utilityService.getAuthorizationToken(authorization);
+        CustomerEntity customer = customerAuthToken.getCustomer();
 
-            CustomerAuthTokenEntity customerAuthToken = authenticationService.authenticate(decodeArray[0], decodeArray[1]);
-            CustomerEntity customer = customerAuthToken.getCustomer();
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setId(customer.getUuid());
+        loginResponse.setFirstName(customer.getFirstname());
+        loginResponse.setLastName(customer.getLastname());
+        loginResponse.setEmailAddress(customer.getEmail());
+        loginResponse.setContactNumber(customer.getContactnumber());
+        loginResponse.setMessage("LOGGED IN SUCCESSFULLY");
 
-            LoginResponse loginResponse = new LoginResponse();
-            loginResponse.setId(customer.getUuid());
-            loginResponse.setFirstName(customer.getFirstname());
-            loginResponse.setLastName(customer.getLastname());
-            loginResponse.setEmailAddress(customer.getEmail());
-            loginResponse.setContactNumber(customer.getContactnumber());
-            loginResponse.setMessage("LOGGED IN SUCCESSFULLY");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("access-token", customerAuthToken.getAccessToken());
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("access-token", customerAuthToken.getAccessToken());
+        return new ResponseEntity<LoginResponse>(loginResponse, headers, HttpStatus.OK);
+    }
 
-            return new ResponseEntity<LoginResponse>(loginResponse, headers, HttpStatus.OK);
-        } else {
-            throw new AuthenticationFailedException("ATH-003",
-                    "Incorrect format of decoded customer name and password");
-        }
+    @RequestMapping(method = RequestMethod.POST,
+            path = "/customer/logout",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<LogoutResponse> logout(@RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException {
+
+        CustomerEntity customerEntity = logoutBusinessService.logout(authorization);
+
+        LogoutResponse logoutResponse = new LogoutResponse()
+                .id(customerEntity.getUuid()).message("LOGGED OUT SUCCESSFULLY");
+
+        return new ResponseEntity<LogoutResponse>(logoutResponse, null, HttpStatus.OK);
+
     }
 }
