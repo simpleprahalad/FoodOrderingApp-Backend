@@ -33,8 +33,16 @@ public class PaymentEntity implements Serializable {
         return uuid;
     }
 
+    public void setUuid(final String uuid) {
+        this.uuid = UUID.fromString(uuid);
+    }
+
     public String getPaymentName() {
         return paymentName;
+    }
+
+    public void setPaymentName(final String paymentName) {
+        this.paymentName = paymentName;
     }
 
     @Override
