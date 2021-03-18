@@ -32,9 +32,10 @@ public class RestExceptionHandler {
                 .code(exc.getCode())
                 .message(exc.getErrorMessage()),
                 HttpStatus.UNAUTHORIZED);
-
+    }
+    
     @ExceptionHandler(CategoryNotFoundException.class)
-    public  ResponseEntity<ErrorResponse> CategoryNotFoundException(CategoryNotFoundException exc, WebRequest request) {
+    public ResponseEntity<ErrorResponse> CategoryNotFoundException(CategoryNotFoundException exc, WebRequest request) {
         return new ResponseEntity<ErrorResponse>(new ErrorResponse().code(exc.getCode()).message(exc.getErrorMessage()), HttpStatus.BAD_REQUEST);
     }
 }
