@@ -41,3 +41,10 @@ FoodOrderingAppBackend-service/target/
 FoodOrderingApp-api/src/main/resources/application.yaml
 
 FoodOrderingApp-db/src/main/resources/config/localhost.properties
+
+#Mac
+.DS_Store
+
+FoodOrderingApp-api/target/
+FoodOrderingApp-db/target/
+FoodOrderingApp-service/target/
