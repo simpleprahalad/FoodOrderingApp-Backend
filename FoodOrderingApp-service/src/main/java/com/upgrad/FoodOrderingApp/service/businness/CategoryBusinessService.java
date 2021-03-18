@@ -21,4 +21,13 @@ public class CategoryBusinessService {
         return categoryDao.getAllCategories();
     }
 
+    /**
+     *
+     * @param categoryId
+     * @return CategoryEntity
+     */
+    public CategoryEntity getCategoryDetails(final String categoryId) {
+        return categoryDao.getCategoryDetails(categoryId);
+    }
+
 }

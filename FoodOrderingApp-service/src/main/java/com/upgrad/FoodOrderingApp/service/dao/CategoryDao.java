@@ -24,4 +24,17 @@ public class CategoryDao {
             return null;
         }
     }
+
+    /**
+     * @return Get category details
+     */
+    public CategoryEntity getCategoryDetails(final String categoryId) {
+        try {
+            return entityManager.createNamedQuery("categoryDetails", CategoryEntity.class)
+                    .setParameter("categoryId", categoryId)
+                    .getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
 }
