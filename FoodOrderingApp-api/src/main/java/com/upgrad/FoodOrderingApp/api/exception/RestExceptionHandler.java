@@ -1,10 +1,7 @@
 package com.upgrad.FoodOrderingApp.api.exception;
 
 import com.upgrad.FoodOrderingApp.api.model.ErrorResponse;
-import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
-import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
-import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
-import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
+import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,9 +29,21 @@ public class RestExceptionHandler {
                 .code(exc.getCode())
                 .message(exc.getErrorMessage()),
                 HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler(CategoryNotFoundException.class)
-    public  ResponseEntity<ErrorResponse> CategoryNotFoundException(CategoryNotFoundException exc, WebRequest request) {
-        return new ResponseEntity<ErrorResponse>(new ErrorResponse().code(exc.getCode()).message(exc.getErrorMessage()), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponse> CategoryNotFoundException(CategoryNotFoundException exc, WebRequest request) {
+        return new ResponseEntity<ErrorResponse>(new ErrorResponse()
+                .code(exc.getCode())
+                .message(exc.getErrorMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UpdateCustomerException.class)
+    public ResponseEntity<ErrorResponse> UpdateCustomerException(UpdateCustomerException exc, WebRequest request) {
+        return new ResponseEntity<ErrorResponse>(new ErrorResponse()
+                .code(exc.getCode())
+                .message(exc.getErrorMessage()),
+                HttpStatus.UNAUTHORIZED);
     }
 }
