@@ -1,5 +1,8 @@
 package com.upgrad.FoodOrderingApp.service.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
