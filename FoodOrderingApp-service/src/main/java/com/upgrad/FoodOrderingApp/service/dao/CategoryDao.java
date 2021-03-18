@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -37,4 +38,24 @@ public class CategoryDao {
             return null;
         }
     }
+
+    /**
+     * @return Get category details
+     */
+    public List<String> getCategoryNamesOfRestaurant(final int restaurantId) {
+        try {
+            List<CategoryEntity> categoryList = entityManager.createNamedQuery("categoryListOfRestaurant", CategoryEntity.class)
+                    .setParameter("restaurantId", restaurantId)
+                    .getResultList();
+            List<String> categoryNameList = new ArrayList<>();
+            for (CategoryEntity category: categoryList) {
+                categoryNameList.add(category.getCategoryName());
+            }
+            return categoryNameList;
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
+
 }
