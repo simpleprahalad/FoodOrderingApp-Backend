@@ -17,9 +17,9 @@ public class CategoryDao {
     /**
      * @return List of all category entities
      */
-    public List<CategoryEntity> getAllCategories() {
+    public List<CategoryEntity> getAllCategoriesOrderedByName() {
         try {
-            return entityManager.createNamedQuery("allCategories", CategoryEntity.class)
+            return entityManager.createNamedQuery("getAllCategoriesOrderedByName", CategoryEntity.class)
                     .getResultList();
         } catch (NoResultException nre) {
             return null;
@@ -29,10 +29,10 @@ public class CategoryDao {
     /**
      * @return Get category details
      */
-    public CategoryEntity getCategoryDetails(final String categoryId) {
+    public CategoryEntity getCategoryById(final String categoryUuid) {
         try {
-            return entityManager.createNamedQuery("categoryDetails", CategoryEntity.class)
-                    .setParameter("categoryId", categoryId)
+            return entityManager.createNamedQuery("getCategoryByUuid", CategoryEntity.class)
+                    .setParameter("categoryUuid", categoryUuid)
                     .getSingleResult();
         } catch (NoResultException nre) {
             return null;

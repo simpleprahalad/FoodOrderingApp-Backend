@@ -6,6 +6,10 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "restaurant_category")
+@NamedQueries({
+
+        @NamedQuery(name = "categoriesOfRestaurant",query = "SELECT r FROM RestaurantCategoryEntity r WHERE r.restaurant= :restaurant ORDER BY r.category.categoryName"),
+})
 public class RestaurantCategoryEntity {
 
     @Id
@@ -13,11 +17,13 @@ public class RestaurantCategoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "restaurant_id")
-    private int restaurantId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "restaurant_id")
+    private RestaurantEntity restaurant;
 
-    @Column(name = "category_id")
-    private int categoryId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private CategoryEntity category;
 
     public int getId() {
         return id;
@@ -27,19 +33,19 @@ public class RestaurantCategoryEntity {
         this.id = id;
     }
 
-    public int getRestaurantId() {
-        return restaurantId;
+    public RestaurantEntity getRestaurant() {
+        return restaurant;
     }
 
-    public void setRestaurantId(int restaurantId) {
-        this.restaurantId = restaurantId;
+    public void setRestaurant(RestaurantEntity restaurant) {
+        this.restaurant = restaurant;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public CategoryEntity getCategory() {
+        return category;
     }
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(CategoryEntity category) {
+        this.category = category;
     }
 }

@@ -1,11 +1,21 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "category_item")
+@NamedQueries({
+
+        @NamedQuery(name = "getItemsByCategory",query = "SELECT c FROM CategoryItemEntity c WHERE c.category = :category ORDER BY c.item.itemName"),
+})
 public class CategoryItemEntity {
 
     @Id
@@ -13,11 +23,13 @@ public class CategoryItemEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "item_id")
-    private int itemId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "item_id")
+    private ItemEntity item;
 
-    @Column(name = "category_id")
-    private int categoryId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private CategoryEntity category;
 
     public int getId() {
         return id;
@@ -27,19 +39,19 @@ public class CategoryItemEntity {
         this.id = id;
     }
 
-    public int getItemId() {
-        return itemId;
+    public ItemEntity getItem() {
+        return item;
     }
 
-    public void setItemId(int uuid) {
-        this.itemId = itemId;
+    public void setItem(ItemEntity item) {
+        this.item = item;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public CategoryEntity getCategory() {
+        return category;
     }
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(CategoryEntity category) {
+        this.category = category;
     }
 }

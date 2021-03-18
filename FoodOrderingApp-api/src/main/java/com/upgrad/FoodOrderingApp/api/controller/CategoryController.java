@@ -1,8 +1,8 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
-import com.upgrad.FoodOrderingApp.service.businness.CategoryBusinessService;
-import com.upgrad.FoodOrderingApp.service.businness.ItemBusinessService;
+import com.upgrad.FoodOrderingApp.service.businness.CategoryService;
+import com.upgrad.FoodOrderingApp.service.businness.ItemService;
 import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
 import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
 import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
@@ -21,10 +21,10 @@ import java.util.*;
 public class CategoryController {
 
     @Autowired
-    CategoryBusinessService categoryBusinessService;
+    CategoryService categoryService;
 
     @Autowired
-    ItemBusinessService itemBusinessService;
+    ItemService itemService;
 
     @RequestMapping(method = RequestMethod.GET,
             value = "/category",
@@ -32,7 +32,7 @@ public class CategoryController {
     public ResponseEntity<List<CategoryListResponse>> getAllCategories() {
 
         //Get all categories as a list of CategoryEntity
-        List<CategoryEntity> categories = categoryBusinessService.getAllCategories();
+        List<CategoryEntity> categories = categoryService.getAllCategoriesOrderedByName();
 
         //Declare list of CategoriesListResponse
         List<CategoryListResponse> allCategoriesResponseList = new ArrayList<>();
@@ -51,7 +51,7 @@ public class CategoryController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/category/{category_id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<CategoryDetailsResponse> getCategoryDetails(@PathVariable("category_id") final String categoryId)
+    public ResponseEntity<CategoryDetailsResponse> getCategoryById(@PathVariable("category_id") final String categoryId)
      throws CategoryNotFoundException {
 
         //Throw exception if category is null
@@ -60,14 +60,14 @@ public class CategoryController {
         }
 
         //Get all categories as a list of CategoryEntity
-        CategoryEntity category = categoryBusinessService.getCategoryDetails(categoryId);
+        CategoryEntity category = categoryService.getCategoryById(categoryId);
         if(category == null) {
             //Throw exception if there are no categories available by the id provided
             throw new CategoryNotFoundException( "CNF-002", "No category by this id");
         }
 
         //Get all items belong to this category
-        List<ItemEntity> items = itemBusinessService.getItemsForCategory(categoryId);
+        List<ItemEntity> items = category.getItems();
 
         //Declare and initialize of CategoryDetailsResponse
         CategoryDetailsResponse categoryDetailsResponse = new CategoryDetailsResponse();
@@ -81,11 +81,7 @@ public class CategoryController {
             itemList.setId(itemUuid);
             itemList.setItemName(item.getItemName());
             itemList.setPrice(item.getPrice());
-
-            //Convert type 0 & 1 value to ItemTypeEnum enum
-            String itemType = item.getType().equals("0") ? "VEG" : "NON_VEG";
-            itemList.setItemType(ItemList.ItemTypeEnum.fromValue(itemType));
-
+            itemList.setItemType(ItemList.ItemTypeEnum.fromValue(item.getType().getValue()));
             itemLists.add(itemList);
         }
         categoryDetailsResponse.setItemList(itemLists);
