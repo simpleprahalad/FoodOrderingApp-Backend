@@ -30,7 +30,7 @@ public class RestaurantDao {
      */
     public List<RestaurantEntity> getRestaurantByName(final String restaurantName) {
         try {
-            return entityManager.createNamedQuery("restaurantByName", RestaurantEntity.class)
+            return entityManager.createNamedQuery("restaurantsByName", RestaurantEntity.class)
                     .setParameter("restaurantName", restaurantName)
                     .getResultList();
         } catch (NoResultException nre) {

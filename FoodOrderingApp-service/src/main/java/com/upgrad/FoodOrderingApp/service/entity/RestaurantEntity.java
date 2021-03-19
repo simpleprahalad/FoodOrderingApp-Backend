@@ -9,8 +9,8 @@ import java.util.UUID;
 @Table(name = "restaurant")
 @NamedQueries(
         {
-                @NamedQuery(name = "allRestaurants", query = "select c from RestaurantEntity c"),
-                @NamedQuery(name = "restaurantByName", query = "select c from RestaurantEntity c where lower(c.restaurantName) like concat('%',lower(:restaurantName),'%') order by c.restaurantName")
+                @NamedQuery(name = "allRestaurants", query = "select c from RestaurantEntity c order by c.customerRating desc"),
+                @NamedQuery(name = "restaurantsByName", query = "select c from RestaurantEntity c where lower(c.restaurantName) like concat('%',lower(:restaurantName),'%') order by c.restaurantName")
         }
 )
 public class RestaurantEntity {

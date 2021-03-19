@@ -4,6 +4,7 @@ import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.CategoryService;
 import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
+import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,8 +31,8 @@ public class RestaurantController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<RestaurantList>> getAllRestaurants() {
 
-        //Get all restaurants as a list of RestaurantEntity
-        List<RestaurantEntity> restaurants = restaurantService.getAllRestaurants();
+        //Get all restaurants order by rating as a list of RestaurantEntity
+        List<RestaurantEntity> restaurants = restaurantService.restaurantsByRating();
 
         //Declare list of RestaurantListResponse
         return getRestaurantListResponseEntity(restaurants);
@@ -42,8 +43,21 @@ public class RestaurantController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<RestaurantList>> getRestaurantsByName(@PathVariable("restaurant_name") final String restaurantName)
     throws RestaurantNotFoundException {
-        //Get all restaurants as a list of RestaurantEntity
-        List<RestaurantEntity> restaurants = restaurantService.getRestaurantsByName(restaurantName);
+        //Get all restaurants by name order by name as a list of RestaurantEntity
+        List<RestaurantEntity> restaurants = restaurantService.restaurantsByName(restaurantName);
+
+        //Declare list of RestaurantListResponse
+        return getRestaurantListResponseEntity(restaurants);
+    }
+
+
+    @RequestMapping(method = RequestMethod.GET,
+            value = "/restaurant/category/{category_id}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<RestaurantList>> getRestaurantsByCategory(@PathVariable("category_id") final String categoryId)
+            throws CategoryNotFoundException {
+        //Get all restaurants by category order by name as a list of RestaurantEntity
+        List<RestaurantEntity> restaurants = restaurantService.restaurantsByCategory(categoryId);
 
         //Declare list of RestaurantListResponse
         return getRestaurantListResponseEntity(restaurants);

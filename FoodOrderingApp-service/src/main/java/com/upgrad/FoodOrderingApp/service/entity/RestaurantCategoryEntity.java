@@ -9,6 +9,8 @@ import java.util.UUID;
 @NamedQueries({
 
         @NamedQuery(name = "categoriesOfRestaurant",query = "SELECT r FROM RestaurantCategoryEntity r WHERE r.restaurant= :restaurant ORDER BY r.category.categoryName"),
+        @NamedQuery(name = "restaurantsByCategory",query = "SELECT r FROM RestaurantCategoryEntity r WHERE r.category= :category ORDER BY r.restaurant.restaurantName"),
+
 })
 public class RestaurantCategoryEntity {
 
