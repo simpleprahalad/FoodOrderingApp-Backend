@@ -73,13 +73,7 @@ public class CategoryController {
         categoryDetailsResponse.setCategoryName(category.getCategoryName());
         final List<ItemList> itemLists = new ArrayList<>(items.size());
         for (ItemEntity item : items) {
-            ItemList itemList = new ItemList();
-            UUID itemUuid = UUID.fromString(item.getUuid());
-            itemList.setId(itemUuid);
-            itemList.setItemName(item.getItemName());
-            itemList.setPrice(item.getPrice());
-            itemList.setItemType(ItemList.ItemTypeEnum.fromValue(item.getType().getValue()));
-            itemLists.add(itemList);
+            RestaurantController.populateItemListObject(itemLists, item);
         }
         categoryDetailsResponse.setItemList(itemLists);
 
