@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -16,9 +17,9 @@ public class CategoryDao {
     /**
      * @return List of all category entities
      */
-    public List<CategoryEntity> getAllCategories() {
+    public List<CategoryEntity> getAllCategoriesOrderedByName() {
         try {
-            return entityManager.createNamedQuery("allCategories", CategoryEntity.class)
+            return entityManager.createNamedQuery("getAllCategoriesOrderedByName", CategoryEntity.class)
                     .getResultList();
         } catch (NoResultException nre) {
             return null;
@@ -28,13 +29,33 @@ public class CategoryDao {
     /**
      * @return Get category details
      */
-    public CategoryEntity getCategoryDetails(final String categoryId) {
+    public CategoryEntity getCategoryById(final String categoryUuid) {
         try {
-            return entityManager.createNamedQuery("categoryDetails", CategoryEntity.class)
-                    .setParameter("categoryId", categoryId)
+            return entityManager.createNamedQuery("getCategoryByUuid", CategoryEntity.class)
+                    .setParameter("categoryUuid", categoryUuid)
                     .getSingleResult();
         } catch (NoResultException nre) {
             return null;
         }
     }
+
+    /**
+     * @return Get category details
+     */
+    public List<String> getCategoryNamesOfRestaurant(final int restaurantId) {
+        try {
+            List<CategoryEntity> categoryList = entityManager.createNamedQuery("categoryListOfRestaurant", CategoryEntity.class)
+                    .setParameter("restaurantId", restaurantId)
+                    .getResultList();
+            List<String> categoryNameList = new ArrayList<>();
+            for (CategoryEntity category: categoryList) {
+                categoryNameList.add(category.getCategoryName());
+            }
+            return categoryNameList;
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
+
 }

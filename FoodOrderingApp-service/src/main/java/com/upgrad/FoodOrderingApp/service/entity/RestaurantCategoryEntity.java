@@ -1,22 +1,18 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "category_item")
+@Table(name = "restaurant_category")
 @NamedQueries({
 
-        @NamedQuery(name = "getItemsByCategory",query = "SELECT c FROM CategoryItemEntity c WHERE c.category = :category ORDER BY c.item.itemName"),
+        @NamedQuery(name = "categoriesOfRestaurant",query = "SELECT r FROM RestaurantCategoryEntity r WHERE r.restaurant= :restaurant ORDER BY r.category.categoryName"),
+        @NamedQuery(name = "restaurantsByCategory",query = "SELECT r FROM RestaurantCategoryEntity r WHERE r.category= :category ORDER BY r.restaurant.restaurantName"),
+
 })
-public class CategoryItemEntity {
+public class RestaurantCategoryEntity {
 
     @Id
     @Column(name = "id")
@@ -24,8 +20,8 @@ public class CategoryItemEntity {
     private int id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "item_id")
-    private ItemEntity item;
+    @JoinColumn(name = "restaurant_id")
+    private RestaurantEntity restaurant;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
@@ -39,12 +35,12 @@ public class CategoryItemEntity {
         this.id = id;
     }
 
-    public ItemEntity getItem() {
-        return item;
+    public RestaurantEntity getRestaurant() {
+        return restaurant;
     }
 
-    public void setItem(ItemEntity item) {
-        this.item = item;
+    public void setRestaurant(RestaurantEntity restaurant) {
+        this.restaurant = restaurant;
     }
 
     public CategoryEntity getCategory() {

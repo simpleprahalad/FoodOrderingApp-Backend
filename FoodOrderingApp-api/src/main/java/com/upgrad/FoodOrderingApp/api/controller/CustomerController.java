@@ -1,9 +1,6 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
-import com.upgrad.FoodOrderingApp.api.model.LoginResponse;
-import com.upgrad.FoodOrderingApp.api.model.LogoutResponse;
-import com.upgrad.FoodOrderingApp.api.model.SignupCustomerRequest;
-import com.upgrad.FoodOrderingApp.api.model.SignupCustomerResponse;
+import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.LogoutBusinessService;
 import com.upgrad.FoodOrderingApp.service.businness.SignupBusinessService;
 import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
@@ -12,15 +9,13 @@ import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
+import com.upgrad.FoodOrderingApp.service.exception.UpdateCustomerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -70,6 +65,7 @@ public class CustomerController {
         return m.matches();
     }
 
+    @CrossOrigin
     @RequestMapping(
             method = RequestMethod.POST,
             path = "/customer/signup",
@@ -107,6 +103,7 @@ public class CustomerController {
         }
     }
 
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.POST,
             path = "/customer/login",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -130,18 +127,44 @@ public class CustomerController {
         return new ResponseEntity<LoginResponse>(loginResponse, headers, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.POST,
             path = "/customer/logout",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LogoutResponse> logout(@RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException {
-
         CustomerEntity customerEntity = logoutBusinessService.logout(authorization);
 
         LogoutResponse logoutResponse = new LogoutResponse()
                 .id(customerEntity.getUuid()).message("LOGGED OUT SUCCESSFULLY");
 
         return new ResponseEntity<LogoutResponse>(logoutResponse, null, HttpStatus.OK);
+    }
 
+    @CrossOrigin
+    @RequestMapping(method = RequestMethod.PUT,
+            path = "/customer",
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<UpdateCustomerResponse> update(@RequestHeader("authorization") final String authorization,
+                                                         @RequestBody(required = false) UpdateCustomerRequest updateCustomerRequest)
+            throws AuthorizationFailedException, UpdateCustomerException {
+        if (updateCustomerRequest.getFirstName() == null) {
+            throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
+        }
+
+        //Access the accessToken from the request Header
+        String accessToken = authorization.split("Bearer ")[1];
+
+        CustomerAuthTokenEntity customerAuthTokenEntity = utilityService.getValidCustomerAuthToken(accessToken);
+
+        UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse();
+        updateCustomerResponse.setFirstName(customerAuthTokenEntity.getCustomer().getFirstname());
+        updateCustomerResponse.setLastName(customerAuthTokenEntity.getCustomer().getLastname());
+        updateCustomerResponse.setId(customerAuthTokenEntity.getCustomer().getUuid());
+        updateCustomerResponse.status("CUSTOMER DETAILS UPDATED SUCCESSFULLY");
+
+
+        return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, null, HttpStatus.OK);
     }
 }
