@@ -38,4 +38,17 @@ public class RestaurantDao {
         }
     }
 
+    /**
+     * @return List of all restaurants entities by id
+     */
+    public List<RestaurantEntity> getRestaurantByUuid(final String restaurantId) {
+        try {
+            return entityManager.createNamedQuery("restaurantByUuid", RestaurantEntity.class)
+                    .setParameter("restaurantUuid", restaurantId)
+                    .getResultList();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
 }

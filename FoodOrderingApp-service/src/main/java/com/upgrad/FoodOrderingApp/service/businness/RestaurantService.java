@@ -61,23 +61,45 @@ public class RestaurantService {
     public List<RestaurantEntity> restaurantsByCategory(final String categoryUuid)
             throws CategoryNotFoundException {
         //Throw exception if category is null
-        if(categoryUuid == null) {
+        if (categoryUuid == null) {
             throw new CategoryNotFoundException("CNF-001", "Category id field should not be empty");
         }
 
         CategoryEntity categoryEntity = categoryDao.getCategoryById(categoryUuid);
-        if(categoryEntity == null) {
+        if (categoryEntity == null) {
             //Throw exception if there are no categories available by the id provided
-            throw new CategoryNotFoundException( "CNF-002", "No category by this id");
+            throw new CategoryNotFoundException("CNF-002", "No category by this id");
         }
         //Fetch all restaurants by provided name
         List<RestaurantCategoryEntity> restaurantCategoryEntities = restaurantCategoryDao.getRestaurantsOfCategory(categoryEntity);
         List<RestaurantEntity> restaurants = new ArrayList<>();
         //Retrieve restaurants from list of RestaurantCategoryEntity
-        for(RestaurantCategoryEntity restaurantCategoryEntity: restaurantCategoryEntities) {
+        for (RestaurantCategoryEntity restaurantCategoryEntity : restaurantCategoryEntities) {
             restaurants.add(restaurantCategoryEntity.getRestaurant());
         }
         return restaurants;
+    }
+
+    /**
+     * @return List of all restaurants by id
+     */
+    public List<RestaurantEntity> restaurantByUuid(final String restaurantId)
+            throws RestaurantNotFoundException {
+        //If the restaurant id field entered by the customer is empty, throw exception
+        if(restaurantId == null) {
+            throw new RestaurantNotFoundException("RNF-002", "Restaurant id field should not be empty");
+        }
+
+        //Fetch all restaurants by provided id
+        List<RestaurantEntity> restaurantEntities = restaurantDao.getRestaurantByUuid(restaurantId);
+
+        //If there are no restaurants by the id entered by the customer, return an empty list
+        if(restaurantEntities == null || restaurantEntities.isEmpty()) {
+            throw new RestaurantNotFoundException("RNF-001", "No restaurant by this id");
+        }
+        else {
+            return restaurantEntities;
+        }
     }
 
 
