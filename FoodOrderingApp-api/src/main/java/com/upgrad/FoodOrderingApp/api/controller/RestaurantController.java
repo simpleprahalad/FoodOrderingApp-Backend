@@ -1,18 +1,13 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
-import com.upgrad.FoodOrderingApp.service.businness.CategoryBusinessService;
-import com.upgrad.FoodOrderingApp.service.businness.ItemBusinessService;
-import com.upgrad.FoodOrderingApp.service.businness.RestaurantBusinessService;
-import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
-import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
+import com.upgrad.FoodOrderingApp.service.businness.CategoryService;
+import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
-import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,10 +18,10 @@ import java.util.*;
 public class RestaurantController {
 
     @Autowired
-    CategoryBusinessService categoryBusinessService;
+    CategoryService categoryService;
 
     @Autowired
-    RestaurantBusinessService restaurantBusinessService;
+    RestaurantService restaurantService;
 
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant",
@@ -34,7 +29,7 @@ public class RestaurantController {
     public ResponseEntity<List<RestaurantList>> getAllRestaurants() {
 
         //Get all restaurants as a list of RestaurantEntity
-        List<RestaurantEntity> restaurants = restaurantBusinessService.getAllRestaurants();
+        List<RestaurantEntity> restaurants = restaurantService.getAllRestaurants();
 
         //Declare list of RestaurantListResponse
         List<RestaurantList> restaurantListResponse = new ArrayList<>();
@@ -53,7 +48,7 @@ public class RestaurantController {
             restaurant.setAddress(null);
 
             //Get Category names of that restaurant
-            List<String> categoryNames = categoryBusinessService.getCategoryNamesOfRestaurant(restaurantEntity.getId());
+            List<String> categoryNames = categoryService.getCategoriesOfRestaurant(restaurantEntity);
             restaurant.setCategories(String.join(", ", categoryNames));
             restaurantListResponse.add(restaurant);
         }

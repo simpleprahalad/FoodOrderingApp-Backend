@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class RestaurantBusinessService {
+public class RestaurantService {
 
     @Autowired
     private RestaurantDao restaurantDao;

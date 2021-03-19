@@ -1,16 +1,13 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
+import com.upgrad.FoodOrderingApp.service.common.ItemType;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Entity
 @Table(name = "item")
-@NamedQueries(
-        {
-                @NamedQuery(name = "itemForCategory", query = "SELECT i FROM ItemEntity i WHERE i.id IN (SELECT ci.itemId FROM CategoryItemEntity ci join CategoryEntity c ON c.id = ci.categoryId where c.uuid =:categoryId)")
-        }
-)
 public class ItemEntity {
     @Id
     @Column(name = "id")
@@ -30,7 +27,7 @@ public class ItemEntity {
 
     @Column(name = "type")
     @Size(max = 10)
-    private String type;
+    private ItemType type;
 
     public int getId() {
         return id;
@@ -64,11 +61,11 @@ public class ItemEntity {
         this.price = price;
     }
 
-    public String getType() {
+    public ItemType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ItemType type) {
         this.type = type;
     }
 }
