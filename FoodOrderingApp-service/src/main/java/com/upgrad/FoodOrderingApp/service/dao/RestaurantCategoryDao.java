@@ -21,14 +21,27 @@ public class RestaurantCategoryDao {
      */
     public List<RestaurantCategoryEntity> getCategoriesOfRestaurant(final RestaurantEntity restaurant) {
         try {
-            List<RestaurantCategoryEntity> restaurantCategoryEntity = entityManager.createNamedQuery("categoriesOfRestaurant",RestaurantCategoryEntity.class)
+            List<RestaurantCategoryEntity> restaurantCategoryEntities = entityManager.createNamedQuery("categoriesOfRestaurant",RestaurantCategoryEntity.class)
                     .setParameter("restaurant",restaurant)
                     .getResultList();
-            return restaurantCategoryEntity;
+            return restaurantCategoryEntities;
         }catch (NoResultException nre){
             return null;
         }
     }
 
+    /**
+     * @return Get restaurants by category
+     */
+    public List<RestaurantCategoryEntity> getRestaurantsOfCategory(final CategoryEntity category) {
+        try {
+            List<RestaurantCategoryEntity> restaurantCategoryEntities = entityManager.createNamedQuery("restaurantsByCategory",RestaurantCategoryEntity.class)
+                    .setParameter("category", category)
+                    .getResultList();
+            return restaurantCategoryEntities;
+        }catch (NoResultException nre){
+            return null;
+        }
+    }
 
 }
