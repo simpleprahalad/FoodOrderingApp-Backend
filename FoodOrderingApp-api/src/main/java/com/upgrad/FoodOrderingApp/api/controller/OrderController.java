@@ -1,10 +1,11 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.CouponDetailsResponse;
-import com.upgrad.FoodOrderingApp.api.model.CustomerOrderResponse;
 import com.upgrad.FoodOrderingApp.service.businness.OrderService;
+import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
 import com.upgrad.FoodOrderingApp.service.entity.CouponDetailsEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
+import com.upgrad.FoodOrderingApp.service.exception.CouponNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     @Autowired
+    private UtilityService utilityService;
+
+    @Autowired
     private OrderService orderService;
 
     @RequestMapping(
@@ -23,43 +27,52 @@ public class OrderController {
             path = "/order/coupon/{coupon_name}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CouponDetailsResponse> getCouponByName(@PathVariable("coupon_name") final String couponName,
-                                                                 @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+                                                                 @RequestHeader("authorization") final String accessToken)
+            throws AuthorizationFailedException, CouponNotFoundException {
+
+        //Validate customer state
+        utilityService.getValidCustomerAuthToken(accessToken);
+
+        if (couponName.isEmpty()) {
+            throw new CouponNotFoundException("CPF-002", "Coupon name field should not be empty");
+        }
+
         final CouponDetailsEntity couponDetails =
-                orderService.getCouponByName(couponName, authorization);
+                orderService.getCouponByCouponName(couponName);
         final CouponDetailsResponse couponDetailsResponse = getCouponDetailsResponseBody(couponDetails);
         return new ResponseEntity<>(couponDetailsResponse, HttpStatus.OK);
     }
 
 
-    @RequestMapping(method = RequestMethod.GET,
-            path = "/order",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<CustomerOrderResponse> getPreviousOrders(@RequestHeader("authorization") final String authorization) {
-        //TODO
-        //Get customer-id of the currently logged in customer
-
-        //Querry DB
-
-        //Return the response payload
-        CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
-        return new ResponseEntity<>(customerOrderResponse, HttpStatus.OK);
-    }
-
-
-    @RequestMapping(method = RequestMethod.POST,
-            path = "/order",
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<CustomerOrderResponse> saveOrder(@RequestHeader("authorization") final String authorization) {
-        //TODO
-        //Get customer-id of the currently logged in customer
-
-        //Querry DB
-
-        //Return the response payload
-        CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
-        return new ResponseEntity<>(customerOrderResponse, HttpStatus.OK);
-    }
+//    @RequestMapping(method = RequestMethod.GET,
+//            path = "/order",
+//            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+//    public ResponseEntity<CustomerOrderResponse> getPreviousOrders(@RequestHeader("authorization") final String authorization) {
+//        //TODO
+//        //Get customer-id of the currently logged in customer
+//
+//        //Querry DB
+//
+//        //Return the response payload
+//        CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
+//        return new ResponseEntity<>(customerOrderResponse, HttpStatus.OK);
+//    }
+//
+//
+//    @RequestMapping(method = RequestMethod.POST,
+//            path = "/order",
+//            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+//            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+//    public ResponseEntity<CustomerOrderResponse> saveOrder(@RequestHeader("authorization") final String authorization) {
+//        //TODO
+//        //Get customer-id of the currently logged in customer
+//
+//        //Querry DB
+//
+//        //Return the response payload
+//        CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
+//        return new ResponseEntity<>(customerOrderResponse, HttpStatus.OK);
+//    }
 
     private CouponDetailsResponse getCouponDetailsResponseBody(final CouponDetailsEntity couponDetailsEntity) {
         final CouponDetailsResponse couponDetailsResponse = new CouponDetailsResponse();
