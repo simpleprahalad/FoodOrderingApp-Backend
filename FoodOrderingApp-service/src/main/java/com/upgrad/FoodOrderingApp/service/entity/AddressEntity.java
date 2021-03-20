@@ -2,11 +2,9 @@ package com.upgrad.FoodOrderingApp.service.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Objects;
@@ -48,11 +46,6 @@ public class AddressEntity {
     @Size(max = 30)
     @NotNull
     private String pincode;
-
-    @Column(name = "city")
-    @Size(max = 30)
-    @NotNull
-    private String city;
 
     @Column(name = "active")
     private Integer active;

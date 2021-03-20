@@ -41,9 +41,6 @@ public class RestaurantEntity {
     @Column(name = "number_of_customers_rated")
     private int numberOfCustomersRated;
 
-    @Column(name = "address_id")
-    private int addressId;
-
     @OneToOne
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private AddressEntity address;
@@ -102,14 +99,6 @@ public class RestaurantEntity {
 
     public void setNumberOfCustomersRated(int numberOfCustomersRated) {
         this.numberOfCustomersRated = numberOfCustomersRated;
-    }
-
-    public int getAddressId() {
-        return addressId;
-    }
-
-    public void setAddressId(int addressId) {
-        this.addressId = addressId;
     }
 
     public AddressEntity getAddress() {
