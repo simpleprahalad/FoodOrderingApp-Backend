@@ -44,6 +44,10 @@ public class RestaurantEntity {
     @Column(name = "address_id")
     private int addressId;
 
+    @OneToOne
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private AddressEntity address;
+
     public int getId() {
         return id;
     }
@@ -106,5 +110,13 @@ public class RestaurantEntity {
 
     public void setAddressId(int addressId) {
         this.addressId = addressId;
+    }
+
+    public AddressEntity getAddress() {
+        return address;
+    }
+
+    public void setAddress(AddressEntity address) {
+        this.address = address;
     }
 }
