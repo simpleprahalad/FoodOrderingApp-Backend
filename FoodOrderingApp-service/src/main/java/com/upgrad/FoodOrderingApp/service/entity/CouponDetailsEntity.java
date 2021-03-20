@@ -15,6 +15,7 @@ import java.util.UUID;
 @Table(name = "coupon")
 @NamedQueries({
         @NamedQuery(name = "getCouponByName", query = "select c from CouponDetailsEntity c where c.coupon_name=:coupon_name"),
+        @NamedQuery(name = "getCouponById", query = "select c from CouponDetailsEntity c where c.uuid=:coupon_id"),
 })
 public class CouponDetailsEntity implements Serializable {
     @Id

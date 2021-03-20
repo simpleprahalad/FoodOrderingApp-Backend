@@ -6,6 +6,8 @@ import com.upgrad.FoodOrderingApp.service.exception.CouponNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class OrderService {
 
@@ -15,4 +17,9 @@ public class OrderService {
     public CouponDetailsEntity getCouponByCouponName(final String couponName) throws CouponNotFoundException {
         return orderDao.getCouponByCouponName(couponName);
     }
+
+    public CouponDetailsEntity getCouponByCouponId(final UUID couponId) throws CouponNotFoundException {
+        return orderDao.getCouponByCouponId(couponId);
+    }
+    
 }
