@@ -15,7 +15,8 @@ import java.util.Collection;
 @NamedQueries(
         {
                 @NamedQuery(name = "customerByContactNumber", query = "select u from CustomerEntity u where u.contact_number=:contact_number"),
-                @NamedQuery(name = "customerByFirstname", query = "select u from CustomerEntity u where u.firstname =:firstname"),
+                @NamedQuery(name = "customerByFirstname", query = "select u from CustomerEntity u where u.firstName =:firstname"),
+                @NamedQuery(name = "customerByUuid", query = "SELECT c from CustomerEntity c where c.uuid = :uuid")
         }
 )
 public class CustomerEntity implements Serializable {
@@ -30,11 +31,11 @@ public class CustomerEntity implements Serializable {
 
     @Column(name = "firstname")
     @Size(max = 30)
-    private String firstname;
+    private String firstName;
 
     @Column(name = "lastname")
     @Size(max = 30)
-    private String lastname;
+    private String lastName;
 
     @Column(name = "email")
     @Size(max = 50)
@@ -69,20 +70,20 @@ public class CustomerEntity implements Serializable {
         this.uuid = uuid;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -128,13 +129,13 @@ public class CustomerEntity implements Serializable {
     }
 
     @OneToMany(mappedBy = "customer")
-    private Collection<CustomerAuthTokenEntity> customerAuthTokenEntity;
+    private Collection<CustomerAuthEntity> customerAuthEntity;
 
-    public Collection<CustomerAuthTokenEntity> getCustomerAuthTokenEntity() {
-        return customerAuthTokenEntity;
+    public Collection<CustomerAuthEntity> getCustomerAuthTokenEntity() {
+        return customerAuthEntity;
     }
 
-    public void setCustomerAuthTokenEntity(Collection<CustomerAuthTokenEntity> customerAuthTokenEntity) {
-        this.customerAuthTokenEntity = customerAuthTokenEntity;
+    public void setCustomerAuthTokenEntity(Collection<CustomerAuthEntity> customerAuthEntity) {
+        this.customerAuthEntity = customerAuthEntity;
     }
 }
