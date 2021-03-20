@@ -41,14 +41,24 @@ public class RestaurantDao {
     /**
      * @return List of all restaurants entities by id
      */
-    public List<RestaurantEntity> getRestaurantByUuid(final String restaurantId) {
+    public RestaurantEntity getRestaurantByUuid(final String restaurantId) {
         try {
             return entityManager.createNamedQuery("restaurantByUuid", RestaurantEntity.class)
                     .setParameter("restaurantUuid", restaurantId)
-                    .getResultList();
+                    .getSingleResult();
         } catch (NoResultException nre) {
             return null;
         }
+    }
+
+    /**
+     *
+     * @param restaurantEntity
+     * @return
+     */
+    public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurantEntity) {
+        entityManager.merge(restaurantEntity);
+        return restaurantEntity;
     }
 
 }
