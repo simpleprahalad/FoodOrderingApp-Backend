@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @Entity
 @Table(name = "customer_auth")
 @NamedQueries({
-        @NamedQuery(name = "customerAuthTokenByAccessToken", query = "select ct from CustomerAuthEntity ct where ct.accessToken = :access_Token")
+        @NamedQuery(name = "customerAuthTokenByAccessToken", query = "select ct from CustomerAuthEntity ct where ct.accessToken=:access_Token")
 })
 public class CustomerAuthEntity implements Serializable {
     @Id
@@ -25,7 +25,7 @@ public class CustomerAuthEntity implements Serializable {
     @Size(max = 200)
     private String uuid;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
 

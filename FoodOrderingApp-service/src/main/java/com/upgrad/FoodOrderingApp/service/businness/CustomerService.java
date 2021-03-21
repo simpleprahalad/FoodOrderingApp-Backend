@@ -133,18 +133,9 @@ public class CustomerService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity updateCustomer(CustomerEntity customerEntity) throws UpdateCustomerException {
-
-        //Getting the CustomerEntity by getCustomerByUuid of customerDao
-        CustomerEntity customerToBeUpdated = customerDao.getCustomerByUuid(customerEntity.getUuid());
-
-        //Setting the new details to the customer entity .
-        customerToBeUpdated.setFirstName(customerEntity.getFirstName());
-        customerToBeUpdated.setLastName(customerEntity.getLastName());
-
+    public CustomerEntity updateCustomer(CustomerEntity customerEntity) {
         //Calls updateCustomer of customerDao to update the customer data in the DB
         CustomerEntity updatedCustomer = customerDao.updateCustomer(customerEntity);
-
         return updatedCustomer;
     }
 
