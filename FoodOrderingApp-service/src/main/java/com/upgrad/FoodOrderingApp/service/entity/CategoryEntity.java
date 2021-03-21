@@ -2,19 +2,19 @@ package com.upgrad.FoodOrderingApp.service.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "category")
 @NamedQueries(
         {
-                @NamedQuery(name = "getCategoryByUuid",query = "SELECT c FROM CategoryEntity c WHERE c.uuid = :categoryUuid"),
-                @NamedQuery(name = "getAllCategoriesOrderedByName",query = "SELECT c FROM CategoryEntity c ORDER BY c.categoryName ASC "),
+                @NamedQuery(name = "getCategoryByUuid", query = "SELECT c FROM CategoryEntity c WHERE c.uuid = :categoryUuid"),
+                @NamedQuery(name = "getAllCategoriesOrderedByName", query = "SELECT c FROM CategoryEntity c ORDER BY c.categoryName ASC "),
         }
 )
-public class CategoryEntity {
+public class CategoryEntity implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,11 +4,11 @@ import com.upgrad.FoodOrderingApp.service.common.ItemType;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.util.UUID;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "item")
-public class ItemEntity {
+public class ItemEntity implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
