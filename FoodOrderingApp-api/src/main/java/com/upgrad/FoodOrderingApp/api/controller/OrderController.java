@@ -6,7 +6,6 @@ import com.upgrad.FoodOrderingApp.api.model.ItemQuantity;
 import com.upgrad.FoodOrderingApp.api.model.SaveOrderRequest;
 import com.upgrad.FoodOrderingApp.service.businness.*;
 import com.upgrad.FoodOrderingApp.service.entity.CouponEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthTokenEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,9 @@ public class OrderController {
     private UtilityService utilityService;
 
     @Autowired
+    private CustomerService customerService;
+
+    @Autowired
     private OrderService orderService;
 
     @Autowired
@@ -42,11 +44,12 @@ public class OrderController {
             path = "/order/coupon/{coupon_name}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CouponDetailsResponse> getCouponByName(@PathVariable("coupon_name") final String couponName,
-                                                                 @RequestHeader("authorization") final String accessToken)
+                                                                 @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, CouponNotFoundException {
 
         //Validate customer state
-        utilityService.getValidCustomerAuthToken(accessToken);
+        String accessToken = authorization.split("Bearer ")[1];
+        utilityService.validateAccessToken(accessToken);
 
         if (couponName.isEmpty()) {
             throw new CouponNotFoundException("CPF-002", "Coupon name field should not be empty");
@@ -63,12 +66,13 @@ public class OrderController {
             path = "/order",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<String> saveOrder(@RequestHeader("authorization") final String accessToken,
+    public ResponseEntity<String> saveOrder(@RequestHeader("authorization") final String authorization,
                                             final SaveOrderRequest saveOrderRequest)
             throws AuthorizationFailedException, CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException, RestaurantNotFoundException, ItemNotFoundException {
 
         //Validate customer state
-        utilityService.getValidCustomerAuthToken(accessToken);
+        String accessToken = authorization.split("Bearer ")[1];
+        utilityService.validateAccessToken(accessToken);
 
         //Validate coupon
         validateCoupon(saveOrderRequest.getCouponId());
@@ -96,12 +100,15 @@ public class OrderController {
     @RequestMapping(method = RequestMethod.GET,
             path = "/order",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<CustomerOrderResponse> getPreviousOrders(@RequestHeader("authorization") final String authorization)
+    public ResponseEntity<CustomerOrderResponse> getPreviousOrders(
+            @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException {
 
+        String accessToken = authorization.split("Bearer ")[1];
+        utilityService.validateAccessToken(accessToken);
+
         //Validate customer state
-        CustomerAuthTokenEntity validCustomerAuthToken = utilityService.getValidCustomerAuthToken(authorization);
-        CustomerEntity customer = validCustomerAuthToken.getCustomer();
+        CustomerEntity customer = customerService.getCustomer(accessToken);
         orderService.getAllOrders(customer.getUuid());
 
         //Return the response payload
@@ -152,9 +159,7 @@ public class OrderController {
         //Compare if item not found throw exception
     }
 
-
     private void updateOrder(final SaveOrderRequest saveOrderRequest) {
         //TODO:
     }
-
 }
