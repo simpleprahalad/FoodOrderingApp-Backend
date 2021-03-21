@@ -6,15 +6,18 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "restaurant")
 @NamedQueries(
         {
-                @NamedQuery(name = "allRestaurants", query = "select r from RestaurantEntity r"),
+                @NamedQuery(name = "allRestaurants", query = "select r from RestaurantEntity r order by r.customerRating desc"),
                 @NamedQuery(name = "restaurantsByName", query = "select r from RestaurantEntity r where lower(r.restaurantName) like concat('%',lower(:restaurantName),'%') order by r.restaurantName"),
                 @NamedQuery(name = "restaurantByUuid", query = "select r from RestaurantEntity r where r.uuid = :restaurantUuid"),
         }
@@ -38,17 +41,32 @@ public class RestaurantEntity implements Serializable {
     private String photoUrl;
 
     @Column(name = "customer_rating")
+    @NotNull
     private BigDecimal customerRating;
 
     @Column(name = "average_price_for_two")
+    @NotNull
     private int averagePriceForTwo;
 
     @Column(name = "number_of_customers_rated")
+    @NotNull
     private int numberOfCustomersRated;
 
     @OneToOne
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private AddressEntity address;
+
+    @ManyToMany
+    @JoinTable(name = "restaurant_item", joinColumns = @JoinColumn(name = "restaurant_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id"))
+    @OrderBy("lower(itemName) asc")
+    private List<ItemEntity> items = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(name = "restaurant_category", joinColumns = @JoinColumn(name = "restaurant_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    @OrderBy("categoryName asc")
+    private List<CategoryEntity> categories = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -90,19 +108,19 @@ public class RestaurantEntity implements Serializable {
         this.customerRating = customerRating;
     }
 
-    public int getAveragePriceForTwo() {
+    public int getAvgPrice() {
         return averagePriceForTwo;
     }
 
-    public void setAveragePriceForTwo(int averagePriceForTwo) {
+    public void setAvgPrice(int averagePriceForTwo) {
         this.averagePriceForTwo = averagePriceForTwo;
     }
 
-    public int getNumberOfCustomersRated() {
+    public int getNumberCustomersRated() {
         return numberOfCustomersRated;
     }
 
-    public void setNumberOfCustomersRated(int numberOfCustomersRated) {
+    public void setNumberCustomersRated(int numberOfCustomersRated) {
         this.numberOfCustomersRated = numberOfCustomersRated;
     }
 
@@ -112,6 +130,22 @@ public class RestaurantEntity implements Serializable {
 
     public void setAddress(AddressEntity address) {
         this.address = address;
+    }
+
+    public List<ItemEntity> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ItemEntity> items) {
+        this.items = items;
+    }
+
+    public List<CategoryEntity> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<CategoryEntity> categories) {
+        this.categories = categories;
     }
 
     @Override

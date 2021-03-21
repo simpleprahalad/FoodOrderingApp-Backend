@@ -1,10 +1,8 @@
 package com.upgrad.FoodOrderingApp.service.businness;
 
 import com.upgrad.FoodOrderingApp.service.dao.CategoryDao;
-import com.upgrad.FoodOrderingApp.service.dao.RestaurantCategoryDao;
 import com.upgrad.FoodOrderingApp.service.dao.RestaurantDao;
 import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
-import com.upgrad.FoodOrderingApp.service.entity.RestaurantCategoryEntity;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
 import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.InvalidRatingException;
@@ -15,7 +13,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +24,6 @@ public class RestaurantService {
 
     @Autowired
     private CategoryDao categoryDao;
-
-    @Autowired
-    private RestaurantCategoryDao restaurantCategoryDao;
 
     /**
      * @return List of all restaurants order by rating
@@ -63,7 +57,7 @@ public class RestaurantService {
     /**
      * @return List of all restaurants by category uuid order by restaurant name
      */
-    public List<RestaurantEntity> restaurantsByCategory(final String categoryUuid)
+    public List<RestaurantEntity> restaurantByCategory(final String categoryUuid)
             throws CategoryNotFoundException {
         //Throw exception if category is null
         if (categoryUuid == null) {
@@ -75,14 +69,8 @@ public class RestaurantService {
             //Throw exception if there are no categories available by the id provided
             throw new CategoryNotFoundException("CNF-002", "No category by this id");
         }
-        //Fetch all restaurants by provided name
-        List<RestaurantCategoryEntity> restaurantCategoryEntities = restaurantCategoryDao.getRestaurantsOfCategory(categoryEntity);
-        List<RestaurantEntity> restaurants = new ArrayList<>();
-        //Retrieve restaurants from list of RestaurantCategoryEntity
-        for (RestaurantCategoryEntity restaurantCategoryEntity : restaurantCategoryEntities) {
-            restaurants.add(restaurantCategoryEntity.getRestaurant());
-        }
-        return restaurants;
+
+        return categoryEntity.getRestaurants();
     }
 
     /**
@@ -116,9 +104,9 @@ public class RestaurantService {
         }
 
         float oldRestaurantRating = restaurantEntity.getCustomerRating().floatValue();
-        Integer oldCustomersRatingCount = restaurantEntity.getNumberOfCustomersRated();
+        Integer oldCustomersRatingCount = restaurantEntity.getNumberCustomersRated();
         //Update number of customer rated
-        restaurantEntity.setNumberOfCustomersRated(oldCustomersRatingCount+1);
+        restaurantEntity.setNumberCustomersRated(oldCustomersRatingCount+1);
 
         /**
          * Calculate avg customer rating

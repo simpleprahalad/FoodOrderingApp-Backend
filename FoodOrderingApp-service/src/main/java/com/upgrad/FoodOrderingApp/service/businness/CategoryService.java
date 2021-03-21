@@ -1,10 +1,8 @@
 package com.upgrad.FoodOrderingApp.service.businness;
 
 import com.upgrad.FoodOrderingApp.service.dao.CategoryDao;
-import com.upgrad.FoodOrderingApp.service.dao.RestaurantCategoryDao;
 import com.upgrad.FoodOrderingApp.service.dao.RestaurantDao;
 import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
-import com.upgrad.FoodOrderingApp.service.entity.RestaurantCategoryEntity;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
 import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +16,6 @@ public class CategoryService {
 
     @Autowired
     CategoryDao categoryDao;
-
-    @Autowired
-    RestaurantCategoryDao restaurantCategoryDao;
 
     @Autowired
     RestaurantDao restaurantDao;
@@ -53,18 +48,13 @@ public class CategoryService {
 
     /**
      *
-     * @param restaurant
+     * @param restaurantId
      * @return list of category entity of restaurant
      */
-    public List<CategoryEntity> getCategoriesOfRestaurant(RestaurantEntity restaurant){
+    public List<CategoryEntity> getCategoriesByRestaurant(String restaurantId){
+        RestaurantEntity restaurantEntity = restaurantDao.getRestaurantByUuid(restaurantId);
 
-        List<RestaurantCategoryEntity> restaurantCategoryEntities = restaurantCategoryDao.getCategoriesOfRestaurant(restaurant);
-
-        List<CategoryEntity> categoriesList = new ArrayList<>();
-        restaurantCategoryEntities.forEach(restaurantCategoryEntity -> {
-            categoriesList.add(restaurantCategoryEntity.getCategory());
-        });
-        return categoriesList;
+        return restaurantEntity.getCategories();
     }
 
 }

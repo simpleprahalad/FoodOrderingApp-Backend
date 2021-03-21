@@ -31,7 +31,7 @@ public class CustomerService {
     @Autowired
     PasswordCryptographyProvider passwordCryptographyProvider; //Provides coding and decoding for the password
 
-    public CustomerEntity getCustomer(String accessToken) throws AuthorizationFailedException {
+    public CustomerEntity getCustomer(final String accessToken) {
         CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
         return customerAuthEntity.getCustomer();
     }

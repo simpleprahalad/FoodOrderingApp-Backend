@@ -42,8 +42,7 @@ public class CustomerController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupCustomerResponse> signup(
-            @RequestBody(required = false) final SignupCustomerRequest signupCustomerRequest)
-            throws SignUpRestrictedException {
+            final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException {
         final CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setUuid(UUID.randomUUID().toString());
         customerEntity.setFirstName(signupCustomerRequest.getFirstName());
@@ -150,6 +149,7 @@ public class CustomerController {
             @RequestHeader("authorization") final String authorization,
             @RequestBody(required = false) UpdatePasswordRequest updatePasswordRequest)
             throws AuthorizationFailedException, UpdateCustomerException {
+
 
         String oldPassword = updatePasswordRequest.getOldPassword();
         String newPassword = updatePasswordRequest.getNewPassword();

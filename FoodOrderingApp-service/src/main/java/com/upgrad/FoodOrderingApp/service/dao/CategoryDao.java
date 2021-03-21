@@ -39,23 +39,5 @@ public class CategoryDao {
         }
     }
 
-    /**
-     * @return Get category details
-     */
-    public List<String> getCategoryNamesOfRestaurant(final int restaurantId) {
-        try {
-            List<CategoryEntity> categoryList = entityManager.createNamedQuery("categoryListOfRestaurant", CategoryEntity.class)
-                    .setParameter("restaurantId", restaurantId)
-                    .getResultList();
-            List<String> categoryNameList = new ArrayList<>();
-            for (CategoryEntity category: categoryList) {
-                categoryNameList.add(category.getCategoryName());
-            }
-            return categoryNameList;
-        } catch (NoResultException nre) {
-            return null;
-        }
-    }
-
 
 }
