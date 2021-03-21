@@ -63,7 +63,7 @@ public class RestaurantService {
     /**
      * @return List of all restaurants by category uuid order by restaurant name
      */
-    public List<RestaurantEntity> restaurantsByCategory(final String categoryUuid)
+    public List<RestaurantEntity> restaurantByCategory(final String categoryUuid)
             throws CategoryNotFoundException {
         //Throw exception if category is null
         if (categoryUuid == null) {
@@ -116,9 +116,9 @@ public class RestaurantService {
         }
 
         float oldRestaurantRating = restaurantEntity.getCustomerRating().floatValue();
-        Integer oldCustomersRatingCount = restaurantEntity.getNumberOfCustomersRated();
+        Integer oldCustomersRatingCount = restaurantEntity.getNumberCustomersRated();
         //Update number of customer rated
-        restaurantEntity.setNumberOfCustomersRated(oldCustomersRatingCount+1);
+        restaurantEntity.setNumberCustomersRated(oldCustomersRatingCount+1);
 
         /**
          * Calculate avg customer rating

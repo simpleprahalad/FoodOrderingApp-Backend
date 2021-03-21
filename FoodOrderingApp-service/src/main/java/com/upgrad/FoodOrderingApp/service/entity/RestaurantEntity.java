@@ -1,6 +1,10 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -33,12 +37,15 @@ public class RestaurantEntity {
     private String photoUrl;
 
     @Column(name = "customer_rating")
+    @NotNull
     private BigDecimal customerRating;
 
     @Column(name = "average_price_for_two")
+    @NotNull
     private int averagePriceForTwo;
 
     @Column(name = "number_of_customers_rated")
+    @NotNull
     private int numberOfCustomersRated;
 
     @OneToOne
@@ -85,19 +92,19 @@ public class RestaurantEntity {
         this.customerRating = customerRating;
     }
 
-    public int getAveragePriceForTwo() {
+    public int getAvgPrice() {
         return averagePriceForTwo;
     }
 
-    public void setAveragePriceForTwo(int averagePriceForTwo) {
+    public void setAvgPrice(int averagePriceForTwo) {
         this.averagePriceForTwo = averagePriceForTwo;
     }
 
-    public int getNumberOfCustomersRated() {
+    public int getNumberCustomersRated() {
         return numberOfCustomersRated;
     }
 
-    public void setNumberOfCustomersRated(int numberOfCustomersRated) {
+    public void setNumberCustomersRated(int numberOfCustomersRated) {
         this.numberOfCustomersRated = numberOfCustomersRated;
     }
 

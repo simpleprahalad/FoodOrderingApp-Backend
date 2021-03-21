@@ -59,10 +59,10 @@ public class RestaurantController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant/category/{category_id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<RestaurantList>> getRestaurantsByCategory(@PathVariable("category_id") final String categoryId)
+    public ResponseEntity<List<RestaurantList>> restaurantByCategory(@PathVariable("category_id") final String categoryId)
             throws CategoryNotFoundException {
         //Get all restaurants by category order by name as a list of RestaurantEntity
-        List<RestaurantEntity> restaurants = restaurantService.restaurantsByCategory(categoryId);
+        List<RestaurantEntity> restaurants = restaurantService.restaurantByCategory(categoryId);
 
         //Declare list of RestaurantListResponse
         return getRestaurantListResponseEntity(restaurants);
@@ -105,7 +105,7 @@ public class RestaurantController {
         for (RestaurantEntity restaurantEntity: restaurants) {
             RestaurantList restaurant = populateRestaurantListObject(restaurantEntity);
             //Get Category names of that restaurant
-            List<CategoryEntity> categoriesList = categoryService.getCategoriesOfRestaurant(restaurantEntity);
+            List<CategoryEntity> categoriesList = categoryService.getCategoriesByRestaurant(restaurantEntity.getUuid());
             restaurant.setCategories(getCommaSeparatedCategoryName(categoriesList));
             restaurantListResponse.add(restaurant);
         }
@@ -118,7 +118,7 @@ public class RestaurantController {
 
         RestaurantDetailsResponse restaurantDetails = populateRestaurantDetailsObject(restaurantEntity);
         //Get Category names of that restaurant
-        List<CategoryEntity> categoriesEntityList = categoryService.getCategoriesOfRestaurant(restaurantEntity);
+        List<CategoryEntity> categoriesEntityList = categoryService.getCategoriesByRestaurant(restaurantEntity.getUuid());
         List<CategoryList> categoriesList = new ArrayList<>();
         for (CategoryEntity categoryEntity: categoriesEntityList) {
             CategoryList categoryList = new CategoryList();
@@ -152,8 +152,8 @@ public class RestaurantController {
                 .restaurantName(restaurantEntity.getRestaurantName())
                 .photoURL(restaurantEntity.getPhotoUrl())
                 .customerRating(restaurantEntity.getCustomerRating())
-                .averagePrice(restaurantEntity.getAveragePriceForTwo())
-                .numberCustomersRated(restaurantEntity.getNumberOfCustomersRated());
+                .averagePrice(restaurantEntity.getAvgPrice())
+                .numberCustomersRated(restaurantEntity.getNumberCustomersRated());
 
         RestaurantDetailsResponseAddress restaurantDetailsResponseAddress = populateAddressObject(restaurantEntity.getAddress());
         restaurant.setAddress(restaurantDetailsResponseAddress);
@@ -166,8 +166,8 @@ public class RestaurantController {
                 .restaurantName(restaurantEntity.getRestaurantName())
                 .photoURL(restaurantEntity.getPhotoUrl())
                 .customerRating(restaurantEntity.getCustomerRating())
-                .averagePrice(restaurantEntity.getAveragePriceForTwo())
-                .numberCustomersRated(restaurantEntity.getNumberOfCustomersRated());
+                .averagePrice(restaurantEntity.getAvgPrice())
+                .numberCustomersRated(restaurantEntity.getNumberCustomersRated());
 
         RestaurantDetailsResponseAddress restaurantDetailsResponseAddress = populateAddressObject(restaurantEntity.getAddress());
         restaurantDetails.setAddress(restaurantDetailsResponseAddress);

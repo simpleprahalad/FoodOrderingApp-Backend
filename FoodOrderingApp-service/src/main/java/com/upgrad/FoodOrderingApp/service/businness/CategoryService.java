@@ -53,12 +53,12 @@ public class CategoryService {
 
     /**
      *
-     * @param restaurant
+     * @param restaurantId
      * @return list of category entity of restaurant
      */
-    public List<CategoryEntity> getCategoriesOfRestaurant(RestaurantEntity restaurant){
+    public List<CategoryEntity> getCategoriesByRestaurant(String restaurantId){
 
-        List<RestaurantCategoryEntity> restaurantCategoryEntities = restaurantCategoryDao.getCategoriesOfRestaurant(restaurant);
+        List<RestaurantCategoryEntity> restaurantCategoryEntities = restaurantCategoryDao.getCategoriesOfRestaurant(restaurantId);
 
         List<CategoryEntity> categoriesList = new ArrayList<>();
         restaurantCategoryEntities.forEach(restaurantCategoryEntity -> {

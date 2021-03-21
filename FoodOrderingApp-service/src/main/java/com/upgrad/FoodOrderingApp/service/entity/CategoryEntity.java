@@ -1,6 +1,7 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ public class CategoryEntity {
 
     @Column(name = "uuid")
     @Size(max = 200)
+    @NotNull
     private String uuid;
 
     @Column(name = "category_name")

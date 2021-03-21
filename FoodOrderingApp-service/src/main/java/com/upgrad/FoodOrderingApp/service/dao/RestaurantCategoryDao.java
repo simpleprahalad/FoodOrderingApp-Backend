@@ -19,10 +19,10 @@ public class RestaurantCategoryDao {
     /**
      * @return Get category names of restaurant
      */
-    public List<RestaurantCategoryEntity> getCategoriesOfRestaurant(final RestaurantEntity restaurant) {
+    public List<RestaurantCategoryEntity> getCategoriesOfRestaurant(final String restaurantId) {
         try {
             List<RestaurantCategoryEntity> restaurantCategoryEntities = entityManager.createNamedQuery("categoriesOfRestaurant",RestaurantCategoryEntity.class)
-                    .setParameter("restaurant",restaurant)
+                    .setParameter("restaurantId",restaurantId)
                     .getResultList();
             return restaurantCategoryEntities;
         }catch (NoResultException nre){
