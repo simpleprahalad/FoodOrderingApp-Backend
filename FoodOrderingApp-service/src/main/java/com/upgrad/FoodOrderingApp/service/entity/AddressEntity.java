@@ -6,8 +6,10 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "address")
@@ -128,6 +130,9 @@ public class AddressEntity {
     }
 
     public void addCustomer(CustomerEntity customer) {
+        if(this.customers == null) {
+            this.customers = new LinkedList<CustomerEntity>();
+        }
         this.customers.add(customer);
     }
 

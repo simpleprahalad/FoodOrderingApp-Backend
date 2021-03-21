@@ -12,7 +12,7 @@ import java.util.Objects;
 @Table(name = "state")
 @NamedQueries(
         {
-                @NamedQuery(name = "getStateByUuid",query = "SELECT s FROM AddressEntity s WHERE s.uuid = :stateUuid")
+                @NamedQuery(name = "getStateByUuid",query = "SELECT s FROM StateEntity s WHERE s.uuid = :stateUuid")
         }
 )
 public class StateEntity {

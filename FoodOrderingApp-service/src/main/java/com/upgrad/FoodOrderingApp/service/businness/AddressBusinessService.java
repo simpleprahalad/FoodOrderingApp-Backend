@@ -35,7 +35,7 @@ public class AddressBusinessService {
         } else if (!isValidPincode(pincode)) {
             throw new SaveAddressException("SAR-002", "Invalid pincode.");
         } else if (state == null) {
-            throw new AddressNotFoundException("ANF-002", "No state by this id");
+            throw new AddressNotFoundException("ANF-002", "No state by this id.");
         }
 
         AddressEntity address = new AddressEntity();
@@ -46,6 +46,7 @@ public class AddressBusinessService {
         address.setCity(city);
         address.setPincode(pincode);
         address.setState(state);
+        address.setActive(1);
 
         String uuid = addressDao.saveAddress(address);
         return uuid;
