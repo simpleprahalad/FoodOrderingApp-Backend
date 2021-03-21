@@ -2,10 +2,7 @@ package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.*;
-import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
-import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
-import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
+import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.InvalidRatingException;
@@ -158,8 +155,8 @@ public class RestaurantController {
                 .averagePrice(restaurantEntity.getAveragePriceForTwo())
                 .numberCustomersRated(restaurantEntity.getNumberOfCustomersRated());
 
-        /** TBD **/
-        restaurant.setAddress(null);
+        RestaurantDetailsResponseAddress restaurantDetailsResponseAddress = populateAddressObject(restaurantEntity.getAddress());
+        restaurant.setAddress(restaurantDetailsResponseAddress);
         return restaurant;
     }
 
@@ -172,9 +169,24 @@ public class RestaurantController {
                 .averagePrice(restaurantEntity.getAveragePriceForTwo())
                 .numberCustomersRated(restaurantEntity.getNumberOfCustomersRated());
 
-        /** TBD **/
-        restaurantDetails.setAddress(null);
+        RestaurantDetailsResponseAddress restaurantDetailsResponseAddress = populateAddressObject(restaurantEntity.getAddress());
+        restaurantDetails.setAddress(restaurantDetailsResponseAddress);
         return restaurantDetails;
+    }
+
+    static RestaurantDetailsResponseAddress populateAddressObject(AddressEntity addressEntity) {
+        StateEntity stateEntity = addressEntity.getState();
+        RestaurantDetailsResponseAddressState restaurantDetailsResponseAddressState = new RestaurantDetailsResponseAddressState()
+                .stateName(stateEntity.getStateName())
+                .id(UUID.fromString(stateEntity.getUuid()));
+        RestaurantDetailsResponseAddress restaurantDetailsResponseAddress = new RestaurantDetailsResponseAddress()
+                .id(UUID.fromString(addressEntity.getUuid()))
+                .flatBuildingName(addressEntity.getFlatBuilNumber())
+                .locality(addressEntity.getLocality())
+                .city(addressEntity.getCity())
+                .pincode(addressEntity.getPincode())
+                .state(restaurantDetailsResponseAddressState);
+        return restaurantDetailsResponseAddress;
     }
 
     private String getCommaSeparatedCategoryName(List<CategoryEntity> categoriesList) {
