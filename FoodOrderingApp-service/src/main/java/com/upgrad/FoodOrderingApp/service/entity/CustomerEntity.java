@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "customer")
@@ -53,6 +54,17 @@ public class CustomerEntity implements Serializable {
     @Size(max = 255)
     @NotNull
     private String salt;
+
+    @ManyToMany(mappedBy = "customers")
+    private List<AddressEntity> addresses;
+
+    public List<AddressEntity> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<AddressEntity> addresses) {
+        this.addresses = addresses;
+    }
 
     public int getId() {
         return id;
