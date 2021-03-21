@@ -32,9 +32,9 @@ public class AddressController {
                                           final SaveAddressRequest saveAddressRequest) throws AuthorizationFailedException {
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
-        CustomerAuthTokenEntity customerAuthTokenEntity = utilityService.getValidCustomerAuthToken(authorization);
+        CustomerAuthTokenEntity customerAuthTokenEntity = utilityService.getValidCustomerAuthToken(accessToken);
 
-
+        addressBusinessService.save
 
         return null;
     }
