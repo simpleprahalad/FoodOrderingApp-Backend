@@ -1,5 +1,6 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -16,14 +17,15 @@ import java.util.List;
 @NamedQueries(
         {
                 @NamedQuery(name = "customerByContactNumber", query = "select u from CustomerEntity u where u.contact_number=:contact_number"),
-                @NamedQuery(name = "customerByFirstname", query = "select u from CustomerEntity u where u.firstname =:firstname"),
+                @NamedQuery(name = "customerByFirstname", query = "select u from CustomerEntity u where u.firstName =:firstname"),
+                @NamedQuery(name = "customerByUuid", query = "SELECT c from CustomerEntity c where c.uuid = :uuid")
         }
 )
 public class CustomerEntity implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "uuid")
     @Size(max = 200)
@@ -31,11 +33,11 @@ public class CustomerEntity implements Serializable {
 
     @Column(name = "firstname")
     @Size(max = 30)
-    private String firstname;
+    private String firstName;
 
     @Column(name = "lastname")
     @Size(max = 30)
-    private String lastname;
+    private String lastName;
 
     @Column(name = "email")
     @Size(max = 50)
@@ -81,20 +83,20 @@ public class CustomerEntity implements Serializable {
         this.uuid = uuid;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -129,6 +131,22 @@ public class CustomerEntity implements Serializable {
         this.salt = salt;
     }
 
+    @OneToMany(mappedBy = "customer")
+    private Collection<CustomerAuthEntity> customerAuthEntity;
+
+    public Collection<CustomerAuthEntity> getCustomerAuthTokenEntity() {
+        return customerAuthEntity;
+    }
+
+    public void setCustomerAuthTokenEntity(Collection<CustomerAuthEntity> customerAuthEntity) {
+        this.customerAuthEntity = customerAuthEntity;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return new EqualsBuilder().append(this, obj).isEquals();
+    }
+
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(this).hashCode();
@@ -137,16 +155,5 @@ public class CustomerEntity implements Serializable {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-    }
-
-    @OneToMany(mappedBy = "customer")
-    private Collection<CustomerAuthTokenEntity> customerAuthTokenEntity;
-
-    public Collection<CustomerAuthTokenEntity> getCustomerAuthTokenEntity() {
-        return customerAuthTokenEntity;
-    }
-
-    public void setCustomerAuthTokenEntity(Collection<CustomerAuthTokenEntity> customerAuthTokenEntity) {
-        this.customerAuthTokenEntity = customerAuthTokenEntity;
     }
 }

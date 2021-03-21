@@ -14,12 +14,13 @@ import java.util.UUID;
 @Entity
 @Table(name = "coupon")
 @NamedQueries({
-        @NamedQuery(name = "getCouponByName", query = "select c from CouponDetailsEntity c where c.coupon_name=:coupon_name"),
-        @NamedQuery(name = "getCouponById", query = "select c from CouponDetailsEntity c where c.uuid=:coupon_id"),
+        @NamedQuery(name = "getCouponByName", query = "select c from CouponEntity c where c.coupon_name=:coupon_name"),
+        @NamedQuery(name = "getCouponById", query = "select c from CouponEntity c where c.uuid=:coupon_id"),
 })
-public class CouponDetailsEntity implements Serializable {
+public class CouponEntity implements Serializable {
     @Id
     @Column(name = "id")
+    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 

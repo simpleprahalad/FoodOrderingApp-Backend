@@ -5,7 +5,8 @@ import com.upgrad.FoodOrderingApp.api.model.CustomerOrderResponse;
 import com.upgrad.FoodOrderingApp.api.model.ItemQuantity;
 import com.upgrad.FoodOrderingApp.api.model.SaveOrderRequest;
 import com.upgrad.FoodOrderingApp.service.businness.*;
-import com.upgrad.FoodOrderingApp.service.entity.CouponDetailsEntity;
+import com.upgrad.FoodOrderingApp.service.entity.CouponEntity;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,9 @@ public class OrderController {
     private UtilityService utilityService;
 
     @Autowired
+    private CustomerService customerService;
+
+    @Autowired
     private OrderService orderService;
 
     @Autowired
@@ -40,17 +44,18 @@ public class OrderController {
             path = "/order/coupon/{coupon_name}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CouponDetailsResponse> getCouponByName(@PathVariable("coupon_name") final String couponName,
-                                                                 @RequestHeader("authorization") final String accessToken)
+                                                                 @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, CouponNotFoundException {
 
         //Validate customer state
-        utilityService.getValidCustomerAuthToken(accessToken);
+        String accessToken = authorization.split("Bearer ")[1];
+        utilityService.validateAccessToken(accessToken);
 
         if (couponName.isEmpty()) {
             throw new CouponNotFoundException("CPF-002", "Coupon name field should not be empty");
         }
 
-        final CouponDetailsEntity couponDetails =
+        final CouponEntity couponDetails =
                 orderService.getCouponByCouponName(couponName);
         final CouponDetailsResponse couponDetailsResponse = getCouponDetailsResponseBody(couponDetails);
         return new ResponseEntity<>(couponDetailsResponse, HttpStatus.OK);
@@ -61,12 +66,13 @@ public class OrderController {
             path = "/order",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<String> saveOrder(@RequestHeader("authorization") final String accessToken,
+    public ResponseEntity<String> saveOrder(@RequestHeader("authorization") final String authorization,
                                             final SaveOrderRequest saveOrderRequest)
             throws AuthorizationFailedException, CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException, RestaurantNotFoundException, ItemNotFoundException {
 
         //Validate customer state
-        utilityService.getValidCustomerAuthToken(accessToken);
+        String accessToken = authorization.split("Bearer ")[1];
+        utilityService.validateAccessToken(accessToken);
 
         //Validate coupon
         validateCoupon(saveOrderRequest.getCouponId());
@@ -94,25 +100,27 @@ public class OrderController {
     @RequestMapping(method = RequestMethod.GET,
             path = "/order",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<CustomerOrderResponse> getPreviousOrders(@RequestHeader("authorization") final String authorization)
+    public ResponseEntity<CustomerOrderResponse> getPreviousOrders(
+            @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException {
 
-        //Validate customer state
-        utilityService.getValidCustomerAuthToken(authorization);
+        String accessToken = authorization.split("Bearer ")[1];
+        utilityService.validateAccessToken(accessToken);
 
-        //TODO:
-        //Querry DB
+        //Validate customer state
+        CustomerEntity customer = customerService.getCustomer(accessToken);
+        orderService.getAllOrders(customer.getUuid());
 
         //Return the response payload
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
         return new ResponseEntity<>(customerOrderResponse, HttpStatus.OK);
     }
 
-    private CouponDetailsResponse getCouponDetailsResponseBody(final CouponDetailsEntity couponDetailsEntity) {
+    private CouponDetailsResponse getCouponDetailsResponseBody(final CouponEntity couponEntity) {
         final CouponDetailsResponse couponDetailsResponse = new CouponDetailsResponse();
-        couponDetailsResponse.setId(couponDetailsEntity.getUuid());
-        couponDetailsResponse.couponName(couponDetailsEntity.getCouponName());
-        couponDetailsResponse.percent(couponDetailsEntity.getPercent());
+        couponDetailsResponse.setId(couponEntity.getUuid());
+        couponDetailsResponse.couponName(couponEntity.getCouponName());
+        couponDetailsResponse.percent(couponEntity.getPercent());
         return couponDetailsResponse;
     }
 
@@ -151,9 +159,7 @@ public class OrderController {
         //Compare if item not found throw exception
     }
 
-
     private void updateOrder(final SaveOrderRequest saveOrderRequest) {
         //TODO:
     }
-
 }

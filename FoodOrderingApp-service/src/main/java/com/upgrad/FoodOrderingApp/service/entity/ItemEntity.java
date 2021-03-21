@@ -5,11 +5,18 @@ import com.upgrad.FoodOrderingApp.service.common.ItemType;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.UUID;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "item")
-public class ItemEntity {
+@NamedQueries(
+        {
+                @NamedQuery(name = "getItems", query = "SELECT i FROM ItemEntity i WHERE i.uuid = :itemUuid order by i.itemName asc "),
+        }
+)
+public class ItemEntity implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +40,12 @@ public class ItemEntity {
     @Size(max = 10)
     @NotNull
     private ItemType type;
+
+    @ManyToMany
+    @JoinTable(name = "category_item",
+            joinColumns = @JoinColumn(name = "item_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private List<ItemEntity> categories = new ArrayList<>();
 
     public int getId() {
         return id;
