@@ -19,7 +19,7 @@ public class CustomerAuthTokenEntity implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "uuid")
     @Size(max = 200)
