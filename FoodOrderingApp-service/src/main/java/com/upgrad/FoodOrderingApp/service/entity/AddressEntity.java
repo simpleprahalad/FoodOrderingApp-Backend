@@ -67,20 +67,12 @@ public class AddressEntity implements Serializable {
     )
     private List<CustomerEntity> customers;
 
-    public String getCity() {
-        return city;
+    public int getId() {
+        return id;
     }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getFlatBuilNumber() {
-        return flatBuilNumber;
-    }
-
-    public void setFlatBuilNumber(String flatBuilNumber) {
-        this.flatBuilNumber = flatBuilNumber;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUuid() {
@@ -91,12 +83,28 @@ public class AddressEntity implements Serializable {
         this.uuid = uuid;
     }
 
+    public String getFlatBuilNumber() {
+        return flatBuilNumber;
+    }
+
+    public void setFlatBuilNumber(String flatBuilNumber) {
+        this.flatBuilNumber = flatBuilNumber;
+    }
+
     public String getLocality() {
         return locality;
     }
 
     public void setLocality(String locality) {
         this.locality = locality;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public String getPincode() {
@@ -107,12 +115,28 @@ public class AddressEntity implements Serializable {
         this.pincode = pincode;
     }
 
+    public Integer getActive() {
+        return active;
+    }
+
+    public void setActive(Integer active) {
+        this.active = active;
+    }
+
     public StateEntity getState() {
         return state;
     }
 
     public void setState(StateEntity state) {
         this.state = state;
+    }
+
+    public List<CustomerEntity> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(List<CustomerEntity> customers) {
+        this.customers = customers;
     }
 
     @Override

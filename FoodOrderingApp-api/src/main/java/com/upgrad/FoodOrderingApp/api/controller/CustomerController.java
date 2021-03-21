@@ -42,7 +42,7 @@ public class CustomerController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupCustomerResponse> signup(
-            final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException {
+            @RequestBody final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException {
         final CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setUuid(UUID.randomUUID().toString());
         customerEntity.setFirstName(signupCustomerRequest.getFirstName());
