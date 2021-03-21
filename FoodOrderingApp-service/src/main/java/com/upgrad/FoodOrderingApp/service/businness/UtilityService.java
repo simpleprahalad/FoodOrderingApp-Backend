@@ -100,9 +100,8 @@ public class UtilityService {
         return (m.find() && m.group().equals(contactNumber));
     }
 
-    public void validateAccessToken(final String accessToken) throws AuthorizationFailedException {
-
-        CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
+    public CustomerAuthEntity validateAccessToken(final String accessToken) throws AuthorizationFailedException {
+        final CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
         //Checking if Customer not logged In
         if (customerAuthEntity == null) {
             throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
@@ -121,7 +120,7 @@ public class UtilityService {
             throw new AuthorizationFailedException("ATHR-003",
                     "Your session is expired. Log in again to access this endpoint.");
         }
-        return;
+        return customerAuthEntity;
     }
 
 }
