@@ -9,52 +9,56 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Entity
-@Table(name = "state")
-@NamedQueries(
-        {
-                @NamedQuery(name = "getStateByUuid",query = "SELECT s FROM StateEntity s WHERE s.uuid = :stateUuid")
-        }
-)
-public class StateEntity implements Serializable {
+@Table(name = "coupon")
+@NamedQueries({
+        @NamedQuery(name = "getCouponByName", query = "select c from CouponEntity c where c.coupon_name=:coupon_name"),
+        @NamedQuery(name = "getCouponById", query = "select c from CouponEntity c where c.uuid=:coupon_id"),
+})
+public class CouponEntity implements Serializable {
     @Id
     @Column(name = "id")
+    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "uuid")
     @Size(max = 200)
     @NotNull
-    private String uuid;
+    private UUID uuid;
 
-    @Column(name = "state_name")
-    @Size(max = 30)
+    @Column(name = "coupon_name")
+    @Size(max = 255)
+    private String coupon_name;
+
+    @Column(name = "percent")
     @NotNull
-    private String stateName;
+    private Integer percent;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 
-    public String getStateName() {
-        return stateName;
+    public String getCouponName() {
+        return coupon_name;
     }
 
-    public void setStateName(String stateName) {
-        this.stateName = stateName;
+    public void setCouponName(String couponName) {
+        this.coupon_name = couponName;
+    }
+
+    public Integer getPercent() {
+        return percent;
+    }
+
+    public void setPercent(Integer percent) {
+        this.percent = percent;
     }
 
     @Override
@@ -71,4 +75,5 @@ public class StateEntity implements Serializable {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
+
 }

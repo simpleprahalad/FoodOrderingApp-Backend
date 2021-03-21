@@ -28,7 +28,7 @@ public class RestExceptionHandler {
         return new ResponseEntity<ErrorResponse>(new ErrorResponse()
                 .code(exc.getCode())
                 .message(exc.getErrorMessage()),
-                HttpStatus.UNAUTHORIZED);
+                HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
@@ -44,7 +44,7 @@ public class RestExceptionHandler {
         return new ResponseEntity<ErrorResponse>(new ErrorResponse()
                 .code(exc.getCode())
                 .message(exc.getErrorMessage()),
-                HttpStatus.UNAUTHORIZED);
+                HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(RestaurantNotFoundException.class)
@@ -54,6 +54,24 @@ public class RestExceptionHandler {
                 .message(exc.getErrorMessage()),
                 HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(CouponNotFoundException.class)
+    public ResponseEntity<ErrorResponse> CouponNotFoundException(CouponNotFoundException exc, WebRequest webRequest) {
+        final ErrorResponse errorResponse = new ErrorResponse()
+                .code(exc.getCode())
+                .message(exc.getErrorMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+
+    @ExceptionHandler(InvalidRatingException.class)
+    public ResponseEntity<ErrorResponse> InvalidRatingException(InvalidRatingException exc, WebRequest request) {
+        return new ResponseEntity<ErrorResponse>(new ErrorResponse()
+                .code(exc.getCode())
+                .message(exc.getErrorMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
+
 
     @ExceptionHandler(SaveAddressException.class)
     public ResponseEntity<ErrorResponse> SaveAddressException(SaveAddressException exc, WebRequest request) {

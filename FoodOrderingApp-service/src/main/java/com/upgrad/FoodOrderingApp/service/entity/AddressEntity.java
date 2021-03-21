@@ -1,15 +1,18 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "address")
@@ -18,11 +21,11 @@ import java.util.Set;
 
         }
 )
-public class AddressEntity {
+public class AddressEntity implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "uuid")
     @NotNull
@@ -130,7 +133,7 @@ public class AddressEntity {
     }
 
     public void addCustomer(CustomerEntity customer) {
-        if(this.customers == null) {
+        if (this.customers == null) {
             this.customers = new LinkedList<CustomerEntity>();
         }
         this.customers.add(customer);
@@ -145,15 +148,17 @@ public class AddressEntity {
     private List<CustomerEntity> customers;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AddressEntity that = (AddressEntity) o;
-        return Objects.equals(uuid, that.uuid);
+    public boolean equals(Object obj) {
+        return new EqualsBuilder().append(this, obj).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid);
+        return new HashCodeBuilder().append(this).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
 }

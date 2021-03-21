@@ -13,13 +13,13 @@ import java.time.ZonedDateTime;
 @Entity
 @Table(name = "customer_auth")
 @NamedQueries({
-        @NamedQuery(name = "customerAuthTokenByAccessToken", query = "select ct from CustomerAuthTokenEntity ct where ct.accessToken = :access_Token")
+        @NamedQuery(name = "customerAuthTokenByAccessToken", query = "select ct from CustomerAuthEntity ct where ct.accessToken = :access_Token")
 })
-public class CustomerAuthTokenEntity implements Serializable {
+public class CustomerAuthEntity implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "uuid")
     @Size(max = 200)
