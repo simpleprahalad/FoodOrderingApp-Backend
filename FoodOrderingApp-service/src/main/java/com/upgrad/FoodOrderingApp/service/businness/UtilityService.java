@@ -10,6 +10,7 @@ import com.upgrad.FoodOrderingApp.service.exception.UpdateCustomerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.regex.Matcher;
@@ -100,9 +101,10 @@ public class UtilityService {
         return (m.find() && m.group().equals(contactNumber));
     }
 
-    public void validateAccessToken(final String accessToken) throws AuthorizationFailedException {
-
+    @Transactional
+    public CustomerAuthEntity validateAccessToken(final String accessToken) throws AuthorizationFailedException {
         CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
+
         //Checking if Customer not logged In
         if (customerAuthEntity == null) {
             throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
@@ -121,7 +123,6 @@ public class UtilityService {
             throw new AuthorizationFailedException("ATHR-003",
                     "Your session is expired. Log in again to access this endpoint.");
         }
-        return;
+        return customerAuthEntity;
     }
-
 }

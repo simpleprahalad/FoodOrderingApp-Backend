@@ -42,7 +42,8 @@ public class CustomerController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupCustomerResponse> signup(
-            final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException {
+            @RequestBody(required = false) final SignupCustomerRequest signupCustomerRequest)
+            throws SignUpRestrictedException {
         final CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setUuid(UUID.randomUUID().toString());
         customerEntity.setFirstName(signupCustomerRequest.getFirstName());
@@ -90,6 +91,7 @@ public class CustomerController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("access-token", customerAuthEntity.getAccessToken());
+        headers.add("access-control-expose-headers", "access-token");
         return new ResponseEntity<LoginResponse>(loginResponse, headers, HttpStatus.OK);
     }
 
@@ -113,13 +115,16 @@ public class CustomerController {
             path = "/customer",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UpdateCustomerResponse> update(@RequestHeader("authorization") final String authorization,
-                                                         @RequestBody(required = false) UpdateCustomerRequest updateCustomerRequest)
+    public ResponseEntity<UpdateCustomerResponse> update(
+            @RequestHeader("authorization") final String authorization,
+            @RequestBody(required = false) UpdateCustomerRequest updateCustomerRequest)
             throws UpdateCustomerException, AuthorizationFailedException {
         utilityService.isValidUpdateCustomerRequest(updateCustomerRequest.getFirstName());
 
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
+        utilityService.validateAccessToken(accessToken);
+
         CustomerEntity customerEntityToBeUpdated = customerService.getCustomer(accessToken);
 
         customerEntityToBeUpdated.setFirstName(updateCustomerRequest.getFirstName());
@@ -141,10 +146,10 @@ public class CustomerController {
             path = "/customer/password",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UpdateCustomerResponse> changePassword(@RequestHeader("authorization") final String authorization,
-                                                                 @RequestBody(required = false) UpdatePasswordRequest updatePasswordRequest)
+    public ResponseEntity<UpdateCustomerResponse> changePassword(
+            @RequestHeader("authorization") final String authorization,
+            @RequestBody(required = false) UpdatePasswordRequest updatePasswordRequest)
             throws AuthorizationFailedException, UpdateCustomerException {
-
 
         String oldPassword = updatePasswordRequest.getOldPassword();
         String newPassword = updatePasswordRequest.getNewPassword();
@@ -153,12 +158,13 @@ public class CustomerController {
 
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
+        utilityService.validateAccessToken(accessToken);
 
         CustomerEntity customerEntityToBeUpdated = customerService.getCustomer(accessToken);
 
         CustomerEntity customerEntity = customerService.updateCustomerPassword(
-                updatePasswordRequest.getOldPassword(),
-                updatePasswordRequest.getNewPassword(),
+                oldPassword,
+                newPassword,
                 customerEntityToBeUpdated
         );
 
