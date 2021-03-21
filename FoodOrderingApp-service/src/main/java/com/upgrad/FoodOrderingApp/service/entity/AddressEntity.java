@@ -11,6 +11,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -34,7 +35,7 @@ public class AddressEntity implements Serializable {
     @Column(name = "flat_buil_number")
     @Size(max = 255)
     @NotNull
-    private String flatBuilNumber;
+    private String flatBuildingName;
 
     @Column(name = "locality")
     @Size(max = 255)
@@ -59,14 +60,6 @@ public class AddressEntity implements Serializable {
     @JoinColumn(name = "state_id", nullable = false)
     private StateEntity state;
 
-    @ManyToMany
-    @JoinTable(
-            name = "customer_address",
-            joinColumns = @JoinColumn(name = "address_id"),
-            inverseJoinColumns = @JoinColumn(name = "customer_id")
-    )
-    private List<CustomerEntity> customers;
-
     public int getId() {
         return id;
     }
@@ -83,12 +76,12 @@ public class AddressEntity implements Serializable {
         this.uuid = uuid;
     }
 
-    public String getFlatBuilNumber() {
-        return flatBuilNumber;
+    public String getFlatBuildingName() {
+        return flatBuildingName;
     }
 
-    public void setFlatBuilNumber(String flatBuilNumber) {
-        this.flatBuilNumber = flatBuilNumber;
+    public void setFlatBuildingName(String flatBuilNumber) {
+        this.flatBuildingName = flatBuilNumber;
     }
 
     public String getLocality() {
@@ -138,6 +131,21 @@ public class AddressEntity implements Serializable {
     public void setCustomers(List<CustomerEntity> customers) {
         this.customers = customers;
     }
+
+    public void addCustomer(CustomerEntity customer) {
+        if (this.customers == null) {
+            this.customers = new LinkedList<CustomerEntity>();
+        }
+        this.customers.add(customer);
+    }
+
+    @ManyToMany
+    @JoinTable(
+            name = "customer_address",
+            joinColumns = @JoinColumn(name = "address_id"),
+            inverseJoinColumns = @JoinColumn(name = "customer_id")
+    )
+    private List<CustomerEntity> customers;
 
     @Override
     public boolean equals(Object obj) {
