@@ -1,18 +1,17 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
-import java.util.UUID;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "restaurant_category")
 @NamedQueries({
 
-        @NamedQuery(name = "categoriesOfRestaurant",query = "SELECT r FROM RestaurantCategoryEntity r WHERE r.restaurant= :restaurant ORDER BY r.category.categoryName"),
-        @NamedQuery(name = "restaurantsByCategory",query = "SELECT r FROM RestaurantCategoryEntity r WHERE r.category= :category ORDER BY r.restaurant.restaurantName"),
+        @NamedQuery(name = "categoriesOfRestaurant", query = "SELECT r FROM RestaurantCategoryEntity r WHERE r.restaurant= :restaurant ORDER BY r.category.categoryName"),
+        @NamedQuery(name = "restaurantsByCategory", query = "SELECT r FROM RestaurantCategoryEntity r WHERE r.category= :category ORDER BY r.restaurant.restaurantName"),
 
 })
-public class RestaurantCategoryEntity {
+public class RestaurantCategoryEntity implements Serializable {
 
     @Id
     @Column(name = "id")

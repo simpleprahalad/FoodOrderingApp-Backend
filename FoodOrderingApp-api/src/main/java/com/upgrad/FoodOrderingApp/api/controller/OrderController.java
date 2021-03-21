@@ -5,7 +5,9 @@ import com.upgrad.FoodOrderingApp.api.model.CustomerOrderResponse;
 import com.upgrad.FoodOrderingApp.api.model.ItemQuantity;
 import com.upgrad.FoodOrderingApp.api.model.SaveOrderRequest;
 import com.upgrad.FoodOrderingApp.service.businness.*;
-import com.upgrad.FoodOrderingApp.service.entity.CouponDetailsEntity;
+import com.upgrad.FoodOrderingApp.service.entity.CouponEntity;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthTokenEntity;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,7 +52,7 @@ public class OrderController {
             throw new CouponNotFoundException("CPF-002", "Coupon name field should not be empty");
         }
 
-        final CouponDetailsEntity couponDetails =
+        final CouponEntity couponDetails =
                 orderService.getCouponByCouponName(couponName);
         final CouponDetailsResponse couponDetailsResponse = getCouponDetailsResponseBody(couponDetails);
         return new ResponseEntity<>(couponDetailsResponse, HttpStatus.OK);
@@ -98,21 +100,20 @@ public class OrderController {
             throws AuthorizationFailedException {
 
         //Validate customer state
-        utilityService.getValidCustomerAuthToken(authorization);
-
-        //TODO:
-        //Querry DB
+        CustomerAuthTokenEntity validCustomerAuthToken = utilityService.getValidCustomerAuthToken(authorization);
+        CustomerEntity customer = validCustomerAuthToken.getCustomer();
+        orderService.getAllOrders(customer.getUuid());
 
         //Return the response payload
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
         return new ResponseEntity<>(customerOrderResponse, HttpStatus.OK);
     }
 
-    private CouponDetailsResponse getCouponDetailsResponseBody(final CouponDetailsEntity couponDetailsEntity) {
+    private CouponDetailsResponse getCouponDetailsResponseBody(final CouponEntity couponEntity) {
         final CouponDetailsResponse couponDetailsResponse = new CouponDetailsResponse();
-        couponDetailsResponse.setId(couponDetailsEntity.getUuid());
-        couponDetailsResponse.couponName(couponDetailsEntity.getCouponName());
-        couponDetailsResponse.percent(couponDetailsEntity.getPercent());
+        couponDetailsResponse.setId(couponEntity.getUuid());
+        couponDetailsResponse.couponName(couponEntity.getCouponName());
+        couponDetailsResponse.percent(couponEntity.getPercent());
         return couponDetailsResponse;
     }
 
