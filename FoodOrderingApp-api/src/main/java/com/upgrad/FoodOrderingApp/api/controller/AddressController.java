@@ -34,7 +34,15 @@ public class AddressController {
         String accessToken = authorization.split("Bearer ")[1];
         CustomerAuthTokenEntity customerAuthTokenEntity = utilityService.getValidCustomerAuthToken(accessToken);
 
-        addressBusinessService.save
+        String flatBuildingName = saveAddressRequest.getFlatBuildingName();
+        String locality = saveAddressRequest.getLocality();
+        String city = saveAddressRequest.getCity();
+        String pincode = saveAddressRequest.getPincode();
+        String stateUuid = saveAddressRequest.getStateUuid();
+
+
+        String addressUuid = addressBusinessService.saveAddress(customerAuthTokenEntity.getCustomer(),
+                flatBuildingName, locality, city, pincode, stateUuid);
 
         return null;
     }

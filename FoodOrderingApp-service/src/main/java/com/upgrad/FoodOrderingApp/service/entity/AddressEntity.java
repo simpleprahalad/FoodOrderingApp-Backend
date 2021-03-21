@@ -30,7 +30,7 @@ public class AddressEntity {
     @Column(name = "flat_buil_number")
     @Size(max = 255)
     @NotNull
-    private String flatBuilNumber;
+    private String flatBuildingName;
 
     @Column(name = "locality")
     @Size(max = 255)
@@ -71,12 +71,12 @@ public class AddressEntity {
         this.uuid = uuid;
     }
 
-    public String getFlatBuilNumber() {
-        return flatBuilNumber;
+    public String getFlatBuildingName() {
+        return flatBuildingName;
     }
 
-    public void setFlatBuilNumber(String flatBuilNumber) {
-        this.flatBuilNumber = flatBuilNumber;
+    public void setFlatBuildingName(String flatBuilNumber) {
+        this.flatBuildingName = flatBuilNumber;
     }
 
     public String getLocality() {
@@ -125,6 +125,10 @@ public class AddressEntity {
 
     public void setCustomers(List<CustomerEntity> customers) {
         this.customers = customers;
+    }
+
+    public void addCustomer(CustomerEntity customer) {
+        this.customers.add(customer);
     }
 
     @ManyToMany
