@@ -1,9 +1,11 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
-import com.upgrad.FoodOrderingApp.service.businness.*;
+import com.upgrad.FoodOrderingApp.service.businness.CategoryService;
+import com.upgrad.FoodOrderingApp.service.businness.ItemService;
+import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
+import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
 import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
@@ -16,7 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/")
@@ -86,12 +90,14 @@ public class RestaurantController {
             path = "/api/restaurant//{restaurant_id}",
             params = "customer_rating",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantDetails(@RequestHeader ("authorization") final String authorization,
+    public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantDetails(@RequestHeader("authorization") final String authorization,
                                                                              @PathVariable(value = "restaurant_id") final String restaurantUuid,
                                                                              @RequestParam(value = "customer_rating") final Double customerRating)
             throws AuthorizationFailedException, RestaurantNotFoundException, InvalidRatingException {
         //Validate authorization code
-        utilityService.getValidCustomerAuthToken(authorization);
+        String accessToken = authorization.split("Bearer ")[1];
+        utilityService.validateAccessToken(accessToken);
+
         //Get restaurant entity from restaurant id
         RestaurantEntity restaurantEntity = restaurantService.restaurantByUuid(restaurantUuid);
         //Update rating
@@ -100,12 +106,12 @@ public class RestaurantController {
         restaurantUpdatedResponse.setId(UUID.fromString(restaurantUuid));
         restaurantUpdatedResponse.setStatus("RESTAURANT RATING UPDATED SUCCESSFULLY");
 
-        return new ResponseEntity<RestaurantUpdatedResponse>(restaurantUpdatedResponse,HttpStatus.OK);
+        return new ResponseEntity<RestaurantUpdatedResponse>(restaurantUpdatedResponse, HttpStatus.OK);
     }
 
     private ResponseEntity<List<RestaurantList>> getRestaurantListResponseEntity(List<RestaurantEntity> restaurants) {
         List<RestaurantList> restaurantListResponse = new ArrayList<>();
-        for (RestaurantEntity restaurantEntity: restaurants) {
+        for (RestaurantEntity restaurantEntity : restaurants) {
             RestaurantList restaurant = populateRestaurantListObject(restaurantEntity);
             //Get Category names of that restaurant
             List<CategoryEntity> categoriesList = categoryService.getCategoriesOfRestaurant(restaurantEntity);
@@ -123,7 +129,7 @@ public class RestaurantController {
         //Get Category names of that restaurant
         List<CategoryEntity> categoriesEntityList = categoryService.getCategoriesOfRestaurant(restaurantEntity);
         List<CategoryList> categoriesList = new ArrayList<>();
-        for (CategoryEntity categoryEntity: categoriesEntityList) {
+        for (CategoryEntity categoryEntity : categoriesEntityList) {
             CategoryList categoryList = new CategoryList();
             UUID uuid = UUID.fromString(categoryEntity.getUuid());
             categoryList.setId(uuid);
@@ -184,8 +190,4 @@ public class RestaurantController {
         });
         return String.join(", ", categoryNames);
     }
-
-
-
-
 }

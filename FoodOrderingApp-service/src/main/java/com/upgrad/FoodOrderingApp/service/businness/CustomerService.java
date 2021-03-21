@@ -63,7 +63,6 @@ public class CustomerService {
         }
 
         if (!utilityService.isValidSignupRequest(customerEntity)) {//Checking if is Valid Signup Request.
-            System.out.println("isValidSignupRequest 5555555 ");
             throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
         }
 
