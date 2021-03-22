@@ -9,7 +9,10 @@ import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.SaveAddressException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +26,7 @@ public class AddressBusinessService {
     @Autowired
     AddressDao addressDao;
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public String saveAddress(CustomerEntity customer, String flatBuildingName, String locality,
                               String city, String pincode, String stateUuid)
             throws SaveAddressException, AddressNotFoundException {
