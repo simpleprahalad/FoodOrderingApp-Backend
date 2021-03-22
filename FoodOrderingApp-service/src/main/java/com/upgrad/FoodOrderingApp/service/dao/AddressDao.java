@@ -9,15 +9,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 @Repository
 public class AddressDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Transactional(propagation = Propagation.REQUIRED)
     public String saveAddress(AddressEntity address) {
         entityManager.persist(address);
         return address.getUuid();
+    }
+
+    public List<AddressEntity> getAddressesByCustomerUuid(String uuid) {
+        List<AddressEntity> customerAddresses = entityManager.createNamedQuery("getAddressesByCustomerUuid", AddressEntity.class)
+                .setParameter("customerUuid", uuid).getResultList();
+        return customerAddresses;
     }
 }

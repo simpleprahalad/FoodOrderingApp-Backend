@@ -18,7 +18,8 @@ import java.util.List;
 @Table(name = "address")
 @NamedQueries(
         {
-
+                @NamedQuery(name = "getAddressesByCustomerUuid", query = "SELECT distinct a FROM AddressEntity a " +
+                        "join a.customers c where c.uuid=:customerUuid")
         }
 )
 public class AddressEntity implements Serializable {
