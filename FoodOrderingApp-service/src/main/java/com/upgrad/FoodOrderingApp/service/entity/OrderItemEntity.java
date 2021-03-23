@@ -7,55 +7,37 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "state")
+@Table(name = "order_item")
 @NamedQueries(
         {
-                @NamedQuery(name = "getStateByUuid",query = "SELECT s FROM StateEntity s WHERE s.uuid = :stateUuid")
+
         }
 )
-public class StateEntity implements Serializable {
+public class OrderItemEntity implements Serializable {
     @Id
     @Column(name = "id")
+    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "uuid")
-    @Size(max = 200)
+    @Column(name = "order_id")
     @NotNull
-    private String uuid;
+    private Integer order_id;
 
-    @Column(name = "state_name")
-    @Size(max = 30)
+    @Column(name = "item_id")
     @NotNull
-    private String stateName;
+    private Integer item_id;
 
-    public Integer getId() {
-        return id;
-    }
+    @Column(name = "quantity")
+    @NotNull
+    private Integer quantity;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getStateName() {
-        return stateName;
-    }
-
-    public void setStateName(String stateName) {
-        this.stateName = stateName;
-    }
+    @Column(name = "price")
+    @NotNull
+    private Integer price;
 
     @Override
     public boolean equals(Object obj) {

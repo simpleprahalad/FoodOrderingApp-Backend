@@ -31,24 +31,8 @@ public class CustomerService {
     @Autowired
     PasswordCryptographyProvider passwordCryptographyProvider; //Provides coding and decoding for the password
 
-    public CustomerEntity getCustomer(String accessToken) throws AuthorizationFailedException {
+    public CustomerEntity getCustomer(final String accessToken) {
         CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
-        //Checking if Customer not logged In
-        if (customerAuthEntity == null) {
-            throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
-        }
-
-        //Checking if customer is logged Out
-        if (customerAuthEntity.getLogoutAt() != null) {
-            throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
-        }
-
-        final ZonedDateTime now = ZonedDateTime.now();
-
-        //Checking accessToken is Expired.
-        if (customerAuthEntity.getExpiresAt().compareTo(now) <= 0) {
-            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
-        }
         return customerAuthEntity.getCustomer();
     }
 
@@ -149,18 +133,9 @@ public class CustomerService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity updateCustomer(CustomerEntity customerEntity) throws UpdateCustomerException {
-
-        //Getting the CustomerEntity by getCustomerByUuid of customerDao
-        CustomerEntity customerToBeUpdated = customerDao.getCustomerByUuid(customerEntity.getUuid());
-
-        //Setting the new details to the customer entity .
-        customerToBeUpdated.setFirstName(customerEntity.getFirstName());
-        customerToBeUpdated.setLastName(customerEntity.getLastName());
-
+    public CustomerEntity updateCustomer(CustomerEntity customerEntity) {
         //Calls updateCustomer of customerDao to update the customer data in the DB
         CustomerEntity updatedCustomer = customerDao.updateCustomer(customerEntity);
-
         return updatedCustomer;
     }
 

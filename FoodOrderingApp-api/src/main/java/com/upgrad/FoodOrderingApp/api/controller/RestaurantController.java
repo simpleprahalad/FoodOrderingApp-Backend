@@ -1,7 +1,10 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
-import com.upgrad.FoodOrderingApp.service.businness.*;
+import com.upgrad.FoodOrderingApp.service.businness.CategoryService;
+import com.upgrad.FoodOrderingApp.service.businness.ItemService;
+import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
+import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
@@ -185,7 +188,7 @@ public class RestaurantController {
                 .id(UUID.fromString(stateEntity.getUuid()));
         RestaurantDetailsResponseAddress restaurantDetailsResponseAddress = new RestaurantDetailsResponseAddress()
                 .id(UUID.fromString(addressEntity.getUuid()))
-                .flatBuildingName(addressEntity.getFlatBuilNumber())
+                .flatBuildingName(addressEntity.getFlatBuildingName())
                 .locality(addressEntity.getLocality())
                 .city(addressEntity.getCity())
                 .pincode(addressEntity.getPincode())
