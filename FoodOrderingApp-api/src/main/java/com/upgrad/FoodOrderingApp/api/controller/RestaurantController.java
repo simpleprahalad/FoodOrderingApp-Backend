@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -76,7 +77,7 @@ public class RestaurantController {
     public ResponseEntity<RestaurantDetailsResponse> getRestaurantByUuid(@PathVariable("restaurant_id") final String restaurantId)
             throws RestaurantNotFoundException {
         //Get all restaurants by category order by name as a list of RestaurantEntity
-        RestaurantEntity restaurant = restaurantService.restaurantByUuid(restaurantId);
+        RestaurantEntity restaurant = restaurantService.restaurantByUUID(restaurantId);
         //Declare list of RestaurantListResponse
         return getRestaurantDetailsResponseEntity(restaurant);
     }
@@ -94,7 +95,7 @@ public class RestaurantController {
         utilityService.validateAccessToken(accessToken);
 
         //Get restaurant entity from restaurant id
-        RestaurantEntity restaurantEntity = restaurantService.restaurantByUuid(restaurantUuid);
+        RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantUuid);
         //Update rating
         RestaurantEntity updatedRestaurantEntity = restaurantService.updateRestaurantRating(restaurantEntity, customerRating);
         RestaurantUpdatedResponse restaurantUpdatedResponse = new RestaurantUpdatedResponse();
@@ -154,7 +155,7 @@ public class RestaurantController {
                 .id(UUID.fromString(restaurantEntity.getUuid()))
                 .restaurantName(restaurantEntity.getRestaurantName())
                 .photoURL(restaurantEntity.getPhotoUrl())
-                .customerRating(restaurantEntity.getCustomerRating())
+                .customerRating(getConvertedRating(restaurantEntity.getCustomerRating()))
                 .averagePrice(restaurantEntity.getAvgPrice())
                 .numberCustomersRated(restaurantEntity.getNumberCustomersRated());
 
@@ -168,7 +169,7 @@ public class RestaurantController {
                 .id(UUID.fromString(restaurantEntity.getUuid()))
                 .restaurantName(restaurantEntity.getRestaurantName())
                 .photoURL(restaurantEntity.getPhotoUrl())
-                .customerRating(restaurantEntity.getCustomerRating())
+                .customerRating(getConvertedRating(restaurantEntity.getCustomerRating()))
                 .averagePrice(restaurantEntity.getAvgPrice())
                 .numberCustomersRated(restaurantEntity.getNumberCustomersRated());
 
@@ -198,5 +199,11 @@ public class RestaurantController {
             categoryNames.add(categoryEntity.getCategoryName());
         });
         return String.join(", ", categoryNames);
+    }
+
+    static BigDecimal getConvertedRating(double rating) {
+        BigDecimal ratingInBigDecimal = BigDecimal.valueOf(rating);
+        ratingInBigDecimal = ratingInBigDecimal.setScale(1, BigDecimal.ROUND_UP);
+        return ratingInBigDecimal;
     }
 }

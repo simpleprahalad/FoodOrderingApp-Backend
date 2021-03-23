@@ -148,7 +148,7 @@ public class OrderController {
     }
 
     private void validateRestaurant(final UUID restaurantId) throws RestaurantNotFoundException {
-        restaurantService.restaurantByUuid(restaurantId.toString());
+        restaurantService.restaurantByUUID(restaurantId.toString());
     }
 
 

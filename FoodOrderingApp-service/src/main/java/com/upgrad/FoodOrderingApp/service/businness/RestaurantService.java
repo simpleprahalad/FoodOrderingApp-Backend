@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,7 +77,7 @@ public class RestaurantService {
     /**
      * @return Restaurant by id
      */
-    public RestaurantEntity restaurantByUuid(final String restaurantId)
+    public RestaurantEntity restaurantByUUID(final String restaurantId)
             throws RestaurantNotFoundException {
         //If the restaurant id field entered by the customer is empty, throw exception
         if(restaurantId == null) {
@@ -103,7 +104,7 @@ public class RestaurantService {
             throw new InvalidRatingException("IRE-001","Restaurant should be in the range of 1 to 5");
         }
 
-        float oldRestaurantRating = restaurantEntity.getCustomerRating().floatValue();
+        float oldRestaurantRating = (float) restaurantEntity.getCustomerRating();
         Integer oldCustomersRatingCount = restaurantEntity.getNumberCustomersRated();
         //Update number of customer rated
         restaurantEntity.setNumberCustomersRated(oldCustomersRatingCount+1);
@@ -113,8 +114,8 @@ public class RestaurantService {
          * New Average rating = (Old average Rating * Old count + NewRating)/NewRatingCount
          * **/
         float newCustomerRating = (float)((oldRestaurantRating * oldCustomersRatingCount) + customerRating) / (oldCustomersRatingCount + 1);
-        BigDecimal ratingInBigDecimal = BigDecimal.valueOf(newCustomerRating);
-        restaurantEntity.setCustomerRating(ratingInBigDecimal.setScale(1, BigDecimal.ROUND_UP));
+        DecimalFormat df = new DecimalFormat("#.#");
+        restaurantEntity.setCustomerRating(Float.parseFloat(df.format(newCustomerRating)));
 
         //Updating restaurant rating
         RestaurantEntity updatedRestaurantEntity = restaurantDao.updateRestaurantRating(restaurantEntity);
