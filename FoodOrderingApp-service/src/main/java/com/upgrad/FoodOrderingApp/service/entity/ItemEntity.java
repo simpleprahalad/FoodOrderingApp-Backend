@@ -14,6 +14,7 @@ import java.util.List;
 @NamedQueries(
         {
                 @NamedQuery(name = "getItems", query = "SELECT i FROM ItemEntity i WHERE i.uuid = :itemUuid order by i.itemName asc "),
+                @NamedQuery(name = "getItemById", query = "SELECT i FROM ItemEntity i WHERE i.uuid = :itemUuid"),
         }
 )
 public class ItemEntity implements Serializable {

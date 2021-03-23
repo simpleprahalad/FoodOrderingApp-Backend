@@ -36,7 +36,7 @@ public class OrdersEntity implements Serializable {
     @NotNull
     private BigDecimal bill;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coupon_id", nullable = true)
     private CouponEntity coupon;
 
@@ -127,7 +127,7 @@ public class OrdersEntity implements Serializable {
     public void setDiscount(BigDecimal discount) {
         this.discount = discount;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         return new EqualsBuilder().append(this, obj).isEquals();

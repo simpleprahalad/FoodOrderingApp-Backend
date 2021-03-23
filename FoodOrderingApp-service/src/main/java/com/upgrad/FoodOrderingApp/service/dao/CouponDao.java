@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.util.UUID;
 
 @Repository
 public class CouponDao {
@@ -23,11 +22,11 @@ public class CouponDao {
         }
     }
 
-    public CouponEntity getCouponByCouponId(final UUID couponId) throws CouponNotFoundException {
+    public CouponEntity getCouponByCouponId(final String couponId) {
         try {
-            return entityManager.createNamedQuery("getCouponById", CouponEntity.class).setParameter("coupon_id", couponId).getSingleResult();
+            return entityManager.createNamedQuery("getCouponById", CouponEntity.class).setParameter("uuid", couponId).getSingleResult();
         } catch (NoResultException nre) {
-            throw new CouponNotFoundException("CPF-002", "No coupon by this id");
+            return null;
         }
     }
 }
