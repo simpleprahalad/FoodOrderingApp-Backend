@@ -6,17 +6,24 @@ import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
+import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SaveAddressException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.UUID;
+
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -67,7 +74,7 @@ public class AddressController {
         List<AddressEntity> addresses = customer.getAddresses();
         AddressListResponse addressListResponse = new AddressListResponse();
 
-        for (AddressEntity a: addresses){
+        for (AddressEntity a : addresses) {
             AddressListState state = new AddressListState().
                     id(UUID.fromString((a.getState().getUuid()))).
                     stateName(a.getState().getStateName());
@@ -82,8 +89,22 @@ public class AddressController {
 
             addressListResponse.addAddressesItem(address);
         }
-
         return addressListResponse.getAddresses();
+    }
 
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/states",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<StatesListResponse> getStates() {
+        final List<StatesList> states = addressBusinessService.getStateList()
+                .stream()
+                .flatMap((Function<StateEntity, Stream<StatesList>>) stateEntity -> Stream.of(new StatesList()
+                        .id(UUID.fromString(stateEntity.getUuid()))
+                        .stateName(stateEntity.getStateName())))
+                .collect(Collectors.toList());
+        
+        final StatesListResponse statesListResponse = new StatesListResponse().states(states);
+        return new ResponseEntity<>(statesListResponse, HttpStatus.OK);
     }
 }
