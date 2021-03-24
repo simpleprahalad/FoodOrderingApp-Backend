@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -93,6 +90,25 @@ public class AddressController {
     }
 
     @RequestMapping(
+            method = RequestMethod.DELETE,
+            value = "/address/{address_id}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<DeleteAddressResponse> deleteAddress(@RequestHeader("authorization") final String authorization,
+                                                               @PathVariable("address_id") final String addressId)
+            throws AuthorizationFailedException, AddressNotFoundException {
+        final String accessToken = authorization.split("Bearer ")[1];
+        final CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
+        final CustomerEntity customer = customerAuthEntity.getCustomer();
+
+        final String deletedAddressUuid = addressBusinessService.deleteAddress(customer, addressId);
+
+        final DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse()
+                .id(UUID.fromString(deletedAddressUuid))
+                .status("ADDRESS DELETED SUCCESSFULLY");
+        return new ResponseEntity<>(deleteAddressResponse, HttpStatus.OK);
+    }
+
+    @RequestMapping(
             method = RequestMethod.GET,
             value = "/states",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -103,7 +119,7 @@ public class AddressController {
                         .id(UUID.fromString(stateEntity.getUuid()))
                         .stateName(stateEntity.getStateName())))
                 .collect(Collectors.toList());
-        
+
         final StatesListResponse statesListResponse = new StatesListResponse().states(states);
         return new ResponseEntity<>(statesListResponse, HttpStatus.OK);
     }
