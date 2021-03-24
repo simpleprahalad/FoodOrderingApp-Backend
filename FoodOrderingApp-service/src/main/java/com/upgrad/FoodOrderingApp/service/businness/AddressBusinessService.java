@@ -54,6 +54,10 @@ public class AddressBusinessService {
         return uuid;
     }
 
+    public List<StateEntity> getStateList() {
+        return stateDao.getAllStates();
+    }
+
     private boolean isValidPincode(String pincode) {
         String regexForDigitsOnly = "[0-9]+";
         Pattern pattern = Pattern.compile(regexForDigitsOnly);
@@ -63,4 +67,6 @@ public class AddressBusinessService {
 
         return (isDigitOnly && isPincodeLengthSix);
     }
+
+
 }
