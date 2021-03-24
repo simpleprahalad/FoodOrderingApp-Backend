@@ -18,13 +18,13 @@ public class CouponDao {
         try {
             return entityManager.createNamedQuery("getCouponByName", CouponEntity.class).setParameter("coupon_name", couponName).getSingleResult();
         } catch (NoResultException nre) {
-            throw new CouponNotFoundException("CPF-001", "No coupon by this name");
+            return null;
         }
     }
 
-    public CouponEntity getCouponByCouponId(final String couponId) {
+    public CouponEntity getCouponByCouponUuid(final String couponUuid) {
         try {
-            return entityManager.createNamedQuery("getCouponById", CouponEntity.class).setParameter("uuid", couponId).getSingleResult();
+            return entityManager.createNamedQuery("getCouponById", CouponEntity.class).setParameter("uuid", couponUuid).getSingleResult();
         } catch (NoResultException nre) {
             return null;
         }

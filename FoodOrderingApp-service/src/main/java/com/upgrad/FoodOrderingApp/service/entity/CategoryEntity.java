@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -39,12 +40,12 @@ public class CategoryEntity implements Serializable {
     @JoinTable(name = "category_item", joinColumns = @JoinColumn(name = "category_id"),
             inverseJoinColumns = @JoinColumn(name = "item_id"))
     @OrderBy("lower(itemName) asc")
-    private List<ItemEntity> items = new ArrayList<>();
+    private List<ItemEntity> items = new LinkedList<>();
 
     @ManyToMany
     @JoinTable(name = "restaurant_category", joinColumns = @JoinColumn(name = "category_id"),
             inverseJoinColumns = @JoinColumn(name = "restaurant_id"))
-    private List<RestaurantEntity> restaurants = new ArrayList<>();
+    private List<RestaurantEntity> restaurants = new LinkedList<>();
 
     public int getId() {
         return id;
