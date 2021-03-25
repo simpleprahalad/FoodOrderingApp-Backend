@@ -49,9 +49,9 @@ public class OrderService {
             throw new AddressNotFoundException("ANF-003", "No address by this id");
         }
         //Change this from Many to One address
-        if(!address.getCustomers().get(0).equals(customer)){
-            throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address");
-        }
+//        if(!address.getCustomers().get(0).equals(customer)){
+//            throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address");
+//        }
         if (payment == null) {
             throw new PaymentMethodNotFoundException("PNF-002", "No payment method found by this id");
         }
@@ -97,6 +97,7 @@ public class OrderService {
         return order.getUuid();
     }
 
+    @Transactional
     public void saveOrderItem(OrderItemEntity orderItemEntity) {
         orderItemDao.saveOrderItem(orderItemEntity);
     }

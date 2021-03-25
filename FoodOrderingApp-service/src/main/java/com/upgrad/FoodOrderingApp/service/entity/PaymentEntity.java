@@ -12,10 +12,10 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "payment")
-@NamedQueries(
-        {@NamedQuery(name = "allPayments", query = "select p from PaymentEntity p")}
-//        {@NamedQuery(name = "paymentByUuid", query = "select p from PaymentEntity p where p.uuid=:uuid")}
-)
+@NamedQueries({
+        @NamedQuery(name = "allPayments", query = "select p from PaymentEntity p"),
+        @NamedQuery(name = "paymentByUuid", query = "select p from PaymentEntity p where p.uuid=:uuid")
+})
 public class PaymentEntity implements Serializable {
     @Id
     @Column(name = "id")
@@ -24,18 +24,18 @@ public class PaymentEntity implements Serializable {
 
     @Column(name = "uuid", nullable = false)
     @Size(max = 200)
-    private UUID uuid;
+    private String uuid;
 
     @Column(name = "payment_name")
     @Size(max = 500)
     private String paymentName;
 
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
     public void setUuid(final String uuid) {
-        this.uuid = UUID.fromString(uuid);
+        this.uuid = uuid;
     }
 
     public String getPaymentName() {

@@ -11,7 +11,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "order_item")
-@IdClass(OrderItemPK.class)
 @NamedQueries(
         {
 
@@ -24,14 +23,15 @@ public class OrderItemEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Id
+//    @EmbeddedId
+//    private OrderItemPK orderItemPK = new OrderItemPK();
+
     @ManyToOne
-    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @JoinColumn(name = "order_id")
     private OrdersEntity order;
 
-    @Id
     @ManyToOne
-    @JoinColumn(name = "item_id", referencedColumnName = "id")
+    @JoinColumn(name = "item_id")
     private ItemEntity item;
 
     @Column(name = "quantity")
@@ -49,6 +49,14 @@ public class OrderItemEntity implements Serializable {
     public void setId(Integer id) {
         this.id = id;
     }
+
+//    public OrderItemPK getOrderItemPK() {
+//        return orderItemPK;
+//    }
+//
+//    public void setOrderItemPK(OrderItemPK orderItemPK) {
+//        this.orderItemPK = orderItemPK;
+//    }
 
     public OrdersEntity getOrder() {
         return order;

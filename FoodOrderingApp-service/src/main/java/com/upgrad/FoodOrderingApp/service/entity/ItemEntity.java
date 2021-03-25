@@ -49,8 +49,8 @@ public class ItemEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private List<CategoryEntity> categories = new LinkedList<CategoryEntity>();
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderItemEntity> orders = new LinkedList<OrderItemEntity>();
+//    @OneToMany(mappedBy = "order")
+//    private List<OrderItemEntity> orders = new LinkedList<OrderItemEntity>();
 
     public List<CategoryEntity> getCategories() {
         return categories;
@@ -60,13 +60,13 @@ public class ItemEntity implements Serializable {
         this.categories = categories;
     }
 
-    public List<OrderItemEntity> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<OrderItemEntity> orders) {
-        this.orders = orders;
-    }
+//    public List<OrderItemEntity> getOrders() {
+//        return orders;
+//    }
+//
+//    public void setOrders(List<OrderItemEntity> orders) {
+//        this.orders = orders;
+//    }
 
     public int getId() {
         return id;

@@ -11,10 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -59,7 +56,7 @@ public class OrderController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveOrderResponse> saveOrder(@RequestHeader("authorization") final String authorization,
-                                                       final SaveOrderRequest saveOrderRequest)
+                                                       @RequestBody final SaveOrderRequest saveOrderRequest)
             throws AuthorizationFailedException, AddressNotFoundException, CouponNotFoundException,
             PaymentMethodNotFoundException, RestaurantNotFoundException, ItemNotFoundException {
 
@@ -78,23 +75,31 @@ public class OrderController {
         String couponUuid = saveOrderRequest.getCouponId().toString();
         String restaurantUuid = saveOrderRequest.getRestaurantId().toString();
 
-        System.out.println("\n\nController 2\n\n");
+        System.out.println("\n\nController 2 a\n\n");
         OrdersEntity order = orderService.makeOrder(bill, couponUuid, discount, paymentUuid, customer, addressUuid, restaurantUuid);
+        List<OrderItemEntity> orderItems = new LinkedList<>();
 
         //Populating order
         for (ItemQuantity itemQuantity: saveOrderRequest.getItemQuantities()){
+            System.out.println("\n\nController 2 b\n\n");
             OrderItemEntity orderItemEntity = new OrderItemEntity();
+            System.out.println("\n\nController 2 c\n\n");
             orderItemEntity.setOrder(order);
             ItemEntity item = itemService.getItemByUuid(itemQuantity.getItemId().toString());
             orderItemEntity.setItem(item);
             orderItemEntity.setQuantity(itemQuantity.getQuantity());
             orderItemEntity.setPrice(itemQuantity.getPrice());
-            orderService.saveOrderItem(orderItemEntity);
+//            order.addOrderItem(orderItemEntity);
+//            orderService.saveOrderItem(orderItemEntity);
+//            System.out.println("\n-----HERE----\n" + orderItemEntity.getId() + "\n-----HERE----\n");
+            orderItems.add(orderItemEntity);
         }
 
-        System.out.println("\n\nController 3\n\n");
         String orderUuid = orderService.saveOrder(order);
-        System.out.println("Controller 4");
+
+        for (OrderItemEntity orderItem: orderItems){
+            orderService.saveOrderItem(orderItem);
+        }
 
         //Return the response payload
         final SaveOrderResponse saveOrderResponse = new SaveOrderResponse();
