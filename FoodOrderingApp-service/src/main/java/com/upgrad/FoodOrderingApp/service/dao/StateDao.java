@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public class StateDao {
+
     @PersistenceContext
     private EntityManager entityManager;
 
