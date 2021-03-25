@@ -61,44 +61,26 @@ public class OrderController {
             PaymentMethodNotFoundException, RestaurantNotFoundException, ItemNotFoundException {
 
         //Validate customer state
-        System.out.println("\n\nController 0\n\n");
         String accessToken = authorization.split("Bearer ")[1];
         final CustomerEntity customer = utilityService.validateAccessToken(accessToken).getCustomer();
 
-        System.out.println("\n\nController 1\n\n");
         String addressUuid = saveOrderRequest.getAddressId();
         String paymentUuid = saveOrderRequest.getPaymentId().toString();
-
         BigDecimal bill = saveOrderRequest.getBill();
-
         BigDecimal discount = saveOrderRequest.getDiscount();
         String couponUuid = saveOrderRequest.getCouponId().toString();
         String restaurantUuid = saveOrderRequest.getRestaurantId().toString();
 
-        System.out.println("\n\nController 2 a\n\n");
-        OrdersEntity order = orderService.makeOrder(bill, couponUuid, discount, paymentUuid, customer, addressUuid, restaurantUuid);
-        List<OrderItemEntity> orderItems = new LinkedList<>();
+        OrdersEntity order = orderService.saveOrder(bill, couponUuid, discount, paymentUuid, customer, addressUuid, restaurantUuid);
 
         //Populating order
         for (ItemQuantity itemQuantity: saveOrderRequest.getItemQuantities()){
-            System.out.println("\n\nController 2 b\n\n");
             OrderItemEntity orderItemEntity = new OrderItemEntity();
-            System.out.println("\n\nController 2 c\n\n");
             orderItemEntity.setOrder(order);
             ItemEntity item = itemService.getItemByUuid(itemQuantity.getItemId().toString());
             orderItemEntity.setItem(item);
             orderItemEntity.setQuantity(itemQuantity.getQuantity());
             orderItemEntity.setPrice(itemQuantity.getPrice());
-//            order.addOrderItem(orderItemEntity);
-//            orderService.saveOrderItem(orderItemEntity);
-//            System.out.println("\n-----HERE----\n" + orderItemEntity.getId() + "\n-----HERE----\n");
-            orderItems.add(orderItemEntity);
-        }
-
-        String orderUuid = orderService.saveOrder(order);
-
-        for (OrderItemEntity orderItem: orderItems){
-            orderService.saveOrderItem(orderItem);
         }
 
         //Return the response payload
@@ -106,16 +88,6 @@ public class OrderController {
         saveOrderResponse.setId(order.getUuid());
         saveOrderResponse.status("ORDER SUCCESSFULLY PLACED");
         return new ResponseEntity<>(saveOrderResponse, HttpStatus.CREATED);
-    }
-
-    private ItemEntity prepareItemEntity(final ItemQuantity itemQuantity) {
-        final ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setUuid(itemQuantity.getItemId().toString());
-        itemEntity.setPrice(itemQuantity.getPrice());
-
-        //TODO: Something is wrong, we can do it over here.
-        //itemEntity.setQuantity(itemQuantity.getQuantity());
-        return itemEntity;
     }
 
     @RequestMapping(method = RequestMethod.GET,

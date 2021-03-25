@@ -36,7 +36,8 @@ public class OrderService {
     @Autowired
     private OrderItemDao orderItemDao;
 
-    public OrdersEntity makeOrder(BigDecimal bill, String couponUuid, BigDecimal discount, String paymentUuid, CustomerEntity customer, String addressUuid, String restaurantUuid) throws CouponNotFoundException, AddressNotFoundException, AuthorizationFailedException, PaymentMethodNotFoundException, RestaurantNotFoundException {
+    @Transactional
+    public OrdersEntity saveOrder(BigDecimal bill, String couponUuid, BigDecimal discount, String paymentUuid, CustomerEntity customer, String addressUuid, String restaurantUuid) throws CouponNotFoundException, AddressNotFoundException, AuthorizationFailedException, PaymentMethodNotFoundException, RestaurantNotFoundException {
         CouponEntity coupon = couponDao.getCouponByCouponUuid(couponUuid);
         AddressEntity address = addressDao.getAddressByUuid(addressUuid);
         PaymentEntity payment = paymentDao.getPaymentByUuid(paymentUuid);
@@ -70,6 +71,9 @@ public class OrderService {
         order.setAddress(address);
         order.setRestaurant(restaurant);
 
+        order.setUuid(UUID.randomUUID().toString());
+        orderDao.saveOrder(order);
+
         return order;
     }
 
@@ -88,13 +92,6 @@ public class OrderService {
 
     public List<OrdersEntity> getAllOrdersOfCustomer(final CustomerEntity customerEntity) {
         return orderDao.getAllOrdersOfCustomerByUuid(customerEntity.getUuid());
-    }
-
-    @Transactional
-    public String saveOrder(OrdersEntity order){
-        order.setUuid(UUID.randomUUID().toString());
-        orderDao.saveOrder(order);
-        return order.getUuid();
     }
 
     @Transactional

@@ -64,15 +64,15 @@ public class OrdersEntity implements Serializable {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
 
-//    @OneToMany(mappedBy = "item")
-//    private List<OrderItemEntity> items;
-//
-//    public void addOrderItem(OrderItemEntity orderItemEntity) {
-//        if(this.items == null){
-//            this.items = new LinkedList<OrderItemEntity>();
-//        }
-//        this.items.add(orderItemEntity);
-//    }
+    @OneToMany(mappedBy = "item")
+    private List<OrderItemEntity> items;
+
+    public void addOrderItem(OrderItemEntity orderItemEntity) {
+        if(this.items == null){
+            this.items = new LinkedList<OrderItemEntity>();
+        }
+        this.items.add(orderItemEntity);
+    }
 
     public Integer getId() {
         return id;
@@ -90,13 +90,13 @@ public class OrdersEntity implements Serializable {
         this.uuid = uuid;
     }
 
-//    public List<OrderItemEntity> getItems() {
-//        return items;
-//    }
-//
-//    public void setItems(List<OrderItemEntity> items) {
-//        this.items = items;
-//    }
+    public List<OrderItemEntity> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItemEntity> items) {
+        this.items = items;
+    }
 
     public Date getDate() {
         return date;
