@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,52 +26,34 @@ public class AddressService {
     @Autowired
     private AddressDao addressDao;
 
-    public StateEntity getStateByUUID(final String stateUuid) {
-        return stateDao.getStateByUuid(stateUuid);
+    public StateEntity getStateByUUID(final String stateUuid) throws AddressNotFoundException {
+        final StateEntity stateEntity = stateDao.getStateByUuid(stateUuid);
+        if (null == stateEntity) {
+            throw new AddressNotFoundException("ANF-002", "No state by this id.");
+        }
+        return stateEntity;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public String saveAddress(CustomerEntity customer, String flatBuildingName, String locality,
-                              String city, String pinCode, String stateUuid)
-            throws SaveAddressException, AddressNotFoundException {
-        StateEntity state = getStateByUUID(stateUuid);
-        if (flatBuildingName == null || locality == null || city == null || stateUuid == null) {
+    public AddressEntity saveAddress(final CustomerEntity customerEntity, final AddressEntity addressEntity) throws SaveAddressException {
+        if (addressEntity.getFlatBuilNo() == null || addressEntity.getLocality() == null || addressEntity.getCity() == null) {
             throw new SaveAddressException("SAR-001", "No field can be empty.");
-        } else if (!isValidPincode(pinCode)) {
+        } else if (!isValidPincode(addressEntity.getPincode())) {
             throw new SaveAddressException("SAR-002", "Invalid pincode.");
-        } else if (state == null) {
-            throw new AddressNotFoundException("ANF-002", "No state by this id.");
         }
-
-        AddressEntity address = new AddressEntity();
-        address.setUuid(UUID.randomUUID().toString());
-        address.addCustomer(customer);
-        address.setFlatBuildingName(flatBuildingName);
-        address.setLocality(locality);
-        address.setCity(city);
-        address.setPincode(pinCode);
-        address.setState(state);
-        address.setActive(1);
-
-        String uuid = addressDao.saveAddress(address);
-        return uuid;
+        addressEntity.addCustomer(customerEntity);
+        return addressDao.saveAddress(addressEntity);
     }
 
-    public List<StateEntity> getStateList() {
-        return stateDao.getAllStates();
+    public AddressEntity deleteAddress(final AddressEntity addressEntity) {
+        return addressDao.deleteAddress(addressEntity);
     }
 
-    @Transactional
-    public String deleteAddress(final CustomerEntity customer, final String addressId) throws AuthorizationFailedException, AddressNotFoundException {
+    public AddressEntity getAddressByUUID(final String addressId, final CustomerEntity customer) throws AuthorizationFailedException, AddressNotFoundException {
         if (addressId.isEmpty()) {
             throw new AddressNotFoundException("ANF-005", "Address id can not be empty");
         }
-        AddressEntity searchedEntity = validateInputAddressBelongsToCustomer(customer, addressId);
-        AddressEntity deletedAddress = addressDao.deleteAddress(searchedEntity);
-        return deletedAddress.getUuid();
-    }
 
-    private AddressEntity validateInputAddressBelongsToCustomer(final CustomerEntity customer, final String addressId) throws AuthorizationFailedException {
         final AddressEntity searchedAddress = addressDao.getAddressesByCustomerUuid(customer.getUuid())
                 .stream()
                 .filter(addressEntity -> addressEntity.getUuid().equalsIgnoreCase(addressId))
@@ -92,5 +73,13 @@ public class AddressService {
         Boolean isDigitOnly = matcher.matches();
 
         return (isDigitOnly && isPincodeLengthSix);
+    }
+
+    public List<AddressEntity> getAllAddress(final CustomerEntity customerEntity) {
+        return customerEntity.getAddresses();
+    }
+
+    public List<StateEntity> getAllStates() {
+        return stateDao.getAllStates();
     }
 }

@@ -13,9 +13,9 @@ public class AddressDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public String saveAddress(final AddressEntity address) {
+    public AddressEntity saveAddress(final AddressEntity address) {
         entityManager.persist(address);
-        return address.getUuid();
+        return address;
     }
 
     public List<AddressEntity> getAddressesByCustomerUuid(final String customerUuid) {
@@ -28,5 +28,4 @@ public class AddressDao {
         entityManager.remove(addressEntity);
         return addressEntity;
     }
-
 }

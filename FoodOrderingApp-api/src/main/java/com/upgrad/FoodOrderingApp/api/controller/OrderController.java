@@ -137,7 +137,7 @@ public class OrderController {
     private OrderListAddress prepareOrderListAddress(final AddressEntity address) {
         final OrderListAddress orderListAddress = new OrderListAddress();
         orderListAddress.city(address.getCity());
-        orderListAddress.flatBuildingName(address.getFlatBuildingName());
+        orderListAddress.flatBuildingName(address.getFlatBuilNo());
         orderListAddress.id(UUID.fromString(address.getUuid()));
         orderListAddress.locality(address.getLocality());
         orderListAddress.pincode(address.getPincode());

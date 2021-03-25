@@ -31,7 +31,7 @@ public class AddressController {
     private UtilityService utilityService;
 
     @Autowired
-    AddressService addressService;
+    private AddressService addressService;
 
     @RequestMapping(
             method = RequestMethod.POST,
@@ -45,17 +45,20 @@ public class AddressController {
         String accessToken = authorization.split("Bearer ")[1];
 
         CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
-        CustomerEntity customer = customerAuthEntity.getCustomer();
+        CustomerEntity customerEntity = customerAuthEntity.getCustomer();
 
-        String flatBuildingName = saveAddressRequest.getFlatBuildingName();
-        String locality = saveAddressRequest.getLocality();
-        String city = saveAddressRequest.getCity();
-        String pinCode = saveAddressRequest.getPincode();
-        String stateUuid = saveAddressRequest.getStateUuid();
+        final AddressEntity addressEntity = new AddressEntity();
+        addressEntity.setUuid(UUID.randomUUID().toString());
+        addressEntity.setFlatBuilNo(saveAddressRequest.getFlatBuildingName());
+        addressEntity.setLocality(saveAddressRequest.getLocality());
+        addressEntity.setCity(saveAddressRequest.getCity());
+        addressEntity.setPincode(saveAddressRequest.getPincode());
+        addressEntity.setState(addressService.getStateByUUID(saveAddressRequest.getStateUuid()));
 
-        String addressUuid = addressService.saveAddress(customer, flatBuildingName, locality, city, pinCode, stateUuid);
-
-        final SaveAddressResponse saveAddressResponse = new SaveAddressResponse().id(addressUuid).status("ADDRESS SUCCESSFULLY REGISTERED");
+        final AddressEntity savedAddress = addressService.saveAddress(customerEntity, addressEntity);
+        final SaveAddressResponse saveAddressResponse = new SaveAddressResponse()
+                .id(savedAddress.getUuid())
+                .status("ADDRESS SUCCESSFULLY REGISTERED");
         return new ResponseEntity<>(saveAddressResponse, HttpStatus.OK);
     }
 
@@ -68,8 +71,7 @@ public class AddressController {
         CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
         CustomerEntity customer = customerAuthEntity.getCustomer();
 
-        List<AddressEntity> addresses = customer.getAddresses();
-
+        final List<AddressEntity> addresses = addressService.getAllAddress(customer);
         AddressListResponse addressListResponse = new AddressListResponse();
         for (AddressEntity a : addresses) {
             AddressListState state = new AddressListState().
@@ -78,7 +80,7 @@ public class AddressController {
 
             AddressList address = new AddressList().
                     id(UUID.fromString(a.getUuid())).
-                    flatBuildingName(a.getFlatBuildingName()).
+                    flatBuildingName(a.getFlatBuilNo()).
                     locality(a.getLocality()).
                     city(a.getCity()).
                     pincode(a.getPincode()).
@@ -100,10 +102,11 @@ public class AddressController {
         final CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
         final CustomerEntity customer = customerAuthEntity.getCustomer();
 
-        final String deletedAddressUuid = addressService.deleteAddress(customer, addressId);
+        final AddressEntity addressToBeDeleted = addressService.getAddressByUUID(addressId, customer);
+        final AddressEntity deletedAddress = addressService.deleteAddress(addressToBeDeleted);
 
         final DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse()
-                .id(UUID.fromString(deletedAddressUuid))
+                .id(UUID.fromString(deletedAddress.getUuid()))
                 .status("ADDRESS DELETED SUCCESSFULLY");
         return new ResponseEntity<>(deleteAddressResponse, HttpStatus.OK);
     }
@@ -113,7 +116,7 @@ public class AddressController {
             value = "/states",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<StatesListResponse> getAllStates() {
-        final List<StatesList> states = addressService.getStateList()
+        final List<StatesList> states = addressService.getAllStates()
                 .stream()
                 .flatMap((Function<StateEntity, Stream<StatesList>>) stateEntity -> Stream.of(new StatesList()
                         .id(UUID.fromString(stateEntity.getUuid()))

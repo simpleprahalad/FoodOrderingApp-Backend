@@ -19,7 +19,7 @@ import java.util.List;
 @NamedQueries(
         {
                 @NamedQuery(name = "getAddressesByCustomerUuid", query = "SELECT distinct a FROM AddressEntity a " +
-                        "join a.customers c where c.uuid=:customerUuid")
+                        "join a.customers c where c.uuid=:customerUuid"),
         }
 )
 public class AddressEntity implements Serializable {
@@ -36,7 +36,7 @@ public class AddressEntity implements Serializable {
     @Column(name = "flat_buil_number")
     @Size(max = 255)
     @NotNull
-    private String flatBuildingName;
+    private String flatBuilNo;
 
     @Column(name = "locality")
     @Size(max = 255)
@@ -75,14 +75,6 @@ public class AddressEntity implements Serializable {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public String getFlatBuildingName() {
-        return flatBuildingName;
-    }
-
-    public void setFlatBuildingName(String flatBuilNumber) {
-        this.flatBuildingName = flatBuilNumber;
     }
 
     public String getLocality() {
@@ -147,6 +139,14 @@ public class AddressEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "customer_id")
     )
     private List<CustomerEntity> customers;
+
+    public String getFlatBuilNo() {
+        return flatBuilNo;
+    }
+
+    public void setFlatBuilNo(String flatBuilNo) {
+        this.flatBuilNo = flatBuilNo;
+    }
 
     @Override
     public boolean equals(Object obj) {
