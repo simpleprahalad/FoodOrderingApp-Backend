@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class AddressBusinessService {
+public class AddressService {
 
     @Autowired
     private StateDao stateDao;
@@ -27,15 +27,18 @@ public class AddressBusinessService {
     @Autowired
     private AddressDao addressDao;
 
+    public StateEntity getStateByUUID(final String stateUuid) {
+        return stateDao.getStateByUuid(stateUuid);
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public String saveAddress(CustomerEntity customer, String flatBuildingName, String locality,
-                              String city, String pincode, String stateUuid)
+                              String city, String pinCode, String stateUuid)
             throws SaveAddressException, AddressNotFoundException {
-        StateEntity state = stateDao.getStateByUuid(stateUuid);
-
+        StateEntity state = getStateByUUID(stateUuid);
         if (flatBuildingName == null || locality == null || city == null || stateUuid == null) {
             throw new SaveAddressException("SAR-001", "No field can be empty.");
-        } else if (!isValidPincode(pincode)) {
+        } else if (!isValidPincode(pinCode)) {
             throw new SaveAddressException("SAR-002", "Invalid pincode.");
         } else if (state == null) {
             throw new AddressNotFoundException("ANF-002", "No state by this id.");
@@ -47,7 +50,7 @@ public class AddressBusinessService {
         address.setFlatBuildingName(flatBuildingName);
         address.setLocality(locality);
         address.setCity(city);
-        address.setPincode(pincode);
+        address.setPincode(pinCode);
         address.setState(state);
         address.setActive(1);
 
