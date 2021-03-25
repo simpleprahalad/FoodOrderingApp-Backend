@@ -1,7 +1,7 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
-import com.upgrad.FoodOrderingApp.service.businness.AddressBusinessService;
+import com.upgrad.FoodOrderingApp.service.businness.AddressService;
 import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
@@ -31,46 +31,46 @@ public class AddressController {
     private UtilityService utilityService;
 
     @Autowired
-    AddressBusinessService addressBusinessService;
+    AddressService addressService;
 
     @RequestMapping(
             method = RequestMethod.POST,
             value = "/address",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public SaveAddressResponse saveAddress(@RequestHeader("authorization") final String authorization,
-                                           final SaveAddressRequest saveAddressRequest)
+    public ResponseEntity<SaveAddressResponse> saveAddress(@RequestHeader("authorization") final String authorization,
+                                                           final SaveAddressRequest saveAddressRequest)
             throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
 
         CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
         CustomerEntity customer = customerAuthEntity.getCustomer();
+
         String flatBuildingName = saveAddressRequest.getFlatBuildingName();
         String locality = saveAddressRequest.getLocality();
         String city = saveAddressRequest.getCity();
-        String pincode = saveAddressRequest.getPincode();
+        String pinCode = saveAddressRequest.getPincode();
         String stateUuid = saveAddressRequest.getStateUuid();
 
-        String addressUuid = addressBusinessService.saveAddress(customer, flatBuildingName, locality, city, pincode, stateUuid);
-        SaveAddressResponse saveAddressResponse = new SaveAddressResponse();
-        saveAddressResponse.id(addressUuid).status("ADDRESS SUCCESSFULLY REGISTERED");
+        String addressUuid = addressService.saveAddress(customer, flatBuildingName, locality, city, pinCode, stateUuid);
 
-        return saveAddressResponse;
+        final SaveAddressResponse saveAddressResponse = new SaveAddressResponse().id(addressUuid).status("ADDRESS SUCCESSFULLY REGISTERED");
+        return new ResponseEntity<>(saveAddressResponse, HttpStatus.OK);
     }
 
     @RequestMapping(
             method = RequestMethod.GET,
             value = "/address/customer",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public List<AddressList> saveAddress(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+    public ResponseEntity<AddressListResponse> getAddressOfCustomer(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
         String accessToken = authorization.split("Bearer ")[1];
         CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
         CustomerEntity customer = customerAuthEntity.getCustomer();
 
         List<AddressEntity> addresses = customer.getAddresses();
-        AddressListResponse addressListResponse = new AddressListResponse();
 
+        AddressListResponse addressListResponse = new AddressListResponse();
         for (AddressEntity a : addresses) {
             AddressListState state = new AddressListState().
                     id(UUID.fromString((a.getState().getUuid()))).
@@ -86,7 +86,7 @@ public class AddressController {
 
             addressListResponse.addAddressesItem(address);
         }
-        return addressListResponse.getAddresses();
+        return new ResponseEntity<>(addressListResponse, HttpStatus.OK);
     }
 
     @RequestMapping(
@@ -100,7 +100,7 @@ public class AddressController {
         final CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
         final CustomerEntity customer = customerAuthEntity.getCustomer();
 
-        final String deletedAddressUuid = addressBusinessService.deleteAddress(customer, addressId);
+        final String deletedAddressUuid = addressService.deleteAddress(customer, addressId);
 
         final DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse()
                 .id(UUID.fromString(deletedAddressUuid))
@@ -112,8 +112,8 @@ public class AddressController {
             method = RequestMethod.GET,
             value = "/states",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<StatesListResponse> getStates() {
-        final List<StatesList> states = addressBusinessService.getStateList()
+    public ResponseEntity<StatesListResponse> getAllStates() {
+        final List<StatesList> states = addressService.getStateList()
                 .stream()
                 .flatMap((Function<StateEntity, Stream<StatesList>>) stateEntity -> Stream.of(new StatesList()
                         .id(UUID.fromString(stateEntity.getUuid()))
