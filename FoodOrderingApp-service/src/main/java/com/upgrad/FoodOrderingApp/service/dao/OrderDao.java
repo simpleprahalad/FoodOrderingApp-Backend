@@ -21,4 +21,9 @@ public class OrderDao {
             return null;
         }
     }
+
+    public String saveOrder(OrdersEntity order) {
+        entityManager.persist(order);
+        return order.getUuid();
+    }
 }
