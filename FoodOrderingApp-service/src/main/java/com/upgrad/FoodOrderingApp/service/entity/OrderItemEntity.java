@@ -11,20 +11,12 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "order_item")
-@NamedQueries(
-        {
-
-        }
-)
 public class OrderItemEntity implements Serializable {
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-//    @EmbeddedId
-//    private OrderItemPK orderItemPK = new OrderItemPK();
 
     @ManyToOne
     @JoinColumn(name = "order_id")
@@ -49,14 +41,6 @@ public class OrderItemEntity implements Serializable {
     public void setId(Integer id) {
         this.id = id;
     }
-
-//    public OrderItemPK getOrderItemPK() {
-//        return orderItemPK;
-//    }
-//
-//    public void setOrderItemPK(OrderItemPK orderItemPK) {
-//        this.orderItemPK = orderItemPK;
-//    }
 
     public OrdersEntity getOrder() {
         return order;
