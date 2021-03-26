@@ -21,4 +21,17 @@ public class OrderDao {
             return null;
         }
     }
+
+    public List<OrdersEntity> getAllOrdersRestaurantUuid(final String restaurantUuid) {
+        try {
+            return entityManager.createNamedQuery("getAllOrdersByRestaurantUUid", OrdersEntity.class).setParameter("restaurantUuid", restaurantUuid).getResultList();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
+    public String saveOrder(OrdersEntity order) {
+        entityManager.persist(order);
+        return order.getUuid();
+    }
 }

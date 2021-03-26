@@ -1,10 +1,7 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
-import com.upgrad.FoodOrderingApp.service.businness.OrderService;
-import com.upgrad.FoodOrderingApp.service.businness.PaymentService;
-import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
-import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
+import com.upgrad.FoodOrderingApp.service.businness.*;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,10 +27,7 @@ public class OrderController {
     private OrderService orderService;
 
     @Autowired
-    private PaymentService paymentService;
-
-    @Autowired
-    private RestaurantService restaurantService;
+    private ItemService itemService;
 
     @RequestMapping(
             method = RequestMethod.GET,
@@ -48,13 +41,12 @@ public class OrderController {
         String accessToken = authorization.split("Bearer ")[1];
         utilityService.validateAccessToken(accessToken);
 
-        if (couponName.isEmpty()) {
-            throw new CouponNotFoundException("CPF-002", "Coupon name field should not be empty");
-        }
+        final CouponEntity coupon = orderService.getCouponByCouponName(couponName);
+        CouponDetailsResponse couponDetailsResponse = new CouponDetailsResponse();
+        couponDetailsResponse.setId(UUID.fromString(coupon.getUuid()));
+        couponDetailsResponse.couponName(coupon.getCouponName());
+        couponDetailsResponse.percent(coupon.getPercent());
 
-        final CouponEntity couponDetails =
-                orderService.getCouponByCouponName(couponName);
-        final CouponDetailsResponse couponDetailsResponse = getCouponDetailsResponseBody(couponDetails);
         return new ResponseEntity<>(couponDetailsResponse, HttpStatus.OK);
     }
 
@@ -64,33 +56,38 @@ public class OrderController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveOrderResponse> saveOrder(@RequestHeader("authorization") final String authorization,
-                                                       final SaveOrderRequest saveOrderRequest)
-            throws AuthorizationFailedException, CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException, RestaurantNotFoundException, ItemNotFoundException {
+                                                       @RequestBody final SaveOrderRequest saveOrderRequest)
+            throws AuthorizationFailedException, AddressNotFoundException, CouponNotFoundException,
+            PaymentMethodNotFoundException, RestaurantNotFoundException, ItemNotFoundException {
 
         //Validate customer state
         String accessToken = authorization.split("Bearer ")[1];
-        utilityService.validateAccessToken(accessToken);
+        final CustomerEntity customer = utilityService.validateAccessToken(accessToken).getCustomer();
 
-        //Validate coupon
-        validateCoupon(saveOrderRequest.getCouponId());
+        String addressUuid = saveOrderRequest.getAddressId();
+        String paymentUuid = saveOrderRequest.getPaymentId().toString();
+        BigDecimal bill = saveOrderRequest.getBill();
+        BigDecimal discount = saveOrderRequest.getDiscount();
+        String couponUuid = saveOrderRequest.getCouponId().toString();
+        String restaurantUuid = saveOrderRequest.getRestaurantId().toString();
 
-        //Validate address
-        validateAddress(saveOrderRequest.getAddressId());
+        OrdersEntity order = orderService.saveOrder(bill, couponUuid, discount, paymentUuid, customer, addressUuid, restaurantUuid);
 
-        //Validate payment method
-        validatePaymentMethod(saveOrderRequest.getPaymentId());
-
-        //validate restaurant
-        validateRestaurant(saveOrderRequest.getRestaurantId());
-
-        //Validate ordered items
-        validateOrderedItem(saveOrderRequest.getItemQuantities());
-
-        //Update the order
-        updateOrder(saveOrderRequest);
+        //Populating order
+        for (ItemQuantity itemQuantity: saveOrderRequest.getItemQuantities()){
+            OrderItemEntity orderItemEntity = new OrderItemEntity();
+            orderItemEntity.setOrder(order);
+            ItemEntity item = itemService.getItemByUuid(itemQuantity.getItemId().toString());
+            orderItemEntity.setItem(item);
+            orderItemEntity.setQuantity(itemQuantity.getQuantity());
+            orderItemEntity.setPrice(itemQuantity.getPrice());
+            orderService.saveOrderItem(orderItemEntity);
+        }
 
         //Return the response payload
         final SaveOrderResponse saveOrderResponse = new SaveOrderResponse();
+        saveOrderResponse.setId(order.getUuid());
+        saveOrderResponse.status("ORDER SUCCESSFULLY PLACED");
         return new ResponseEntity<>(saveOrderResponse, HttpStatus.CREATED);
     }
 
@@ -110,9 +107,7 @@ public class OrderController {
         final List<OrderList> orderList = orderService.getAllOrdersOfCustomer(customer)
                 .stream()
                 .sorted(Comparator.comparing(OrdersEntity::getDate)) //Reorder based on date of order creation
-                .flatMap((Function<OrdersEntity, Stream<OrderList>>) ordersEntity -> {
-                    return Stream.of(prepareOrderList(ordersEntity));
-                })
+                .flatMap((Function<OrdersEntity, Stream<OrderList>>) ordersEntity -> Stream.of(prepareOrderListObject(ordersEntity)))
                 .collect(Collectors.toList());
 
         //Return the response payload
@@ -121,7 +116,7 @@ public class OrderController {
         return new ResponseEntity<>(customerOrderResponse, HttpStatus.OK);
     }
 
-    private OrderList prepareOrderList(final OrdersEntity ordersEntity) {
+    private OrderList prepareOrderListObject(final OrdersEntity ordersEntity) {
         final OrderList orderList = new OrderList();
         orderList.bill(ordersEntity.getBill());
         orderList.discount(ordersEntity.getDiscount());
@@ -166,55 +161,9 @@ public class OrderController {
         final CouponEntity couponEntity = ordersEntity.getCoupon();
         OrderListCoupon orderListCoupon = new OrderListCoupon();
         orderListCoupon.setCouponName(couponEntity.getCouponName());
-        orderListCoupon.setId(couponEntity.getUuid());
+        orderListCoupon.setId(UUID.fromString(couponEntity.getUuid()));
         orderListCoupon.setPercent(couponEntity.getPercent());
         return orderListCoupon;
     }
 
-    private CouponDetailsResponse getCouponDetailsResponseBody(final CouponEntity couponEntity) {
-        final CouponDetailsResponse couponDetailsResponse = new CouponDetailsResponse();
-        couponDetailsResponse.setId(couponEntity.getUuid());
-        couponDetailsResponse.couponName(couponEntity.getCouponName());
-        couponDetailsResponse.percent(couponEntity.getPercent());
-        return couponDetailsResponse;
-    }
-
-    private void validateCoupon(final UUID couponId) throws CouponNotFoundException {
-        orderService.getCouponByCouponId(couponId);
-    }
-
-    private void validateAddress(final String addressId) throws AddressNotFoundException, AuthorizationFailedException {
-        //TODO:
-
-        //If the address uuid entered by the customer does not match any address that exists in the database, throw “AddressNotFoundException” with the message code (ANF-003) and message (No address by this id) and their corresponding HTTP status.
-
-        //If the address uuid entered by the customer does not belong to him, throw “AuthorizationFailedException” with the message code (ATHR-004) and message (You are not authorized to view/update/delete any one else's address) and their corresponding HTTP status.
-    }
-
-
-    private void validatePaymentMethod(final UUID paymentId) throws PaymentMethodNotFoundException {
-        final boolean anyPaymentMethodFound = paymentService.getAllPaymentMethods()
-                .stream()
-                .anyMatch(paymentEntity -> paymentEntity.getUuid() == paymentId);
-
-        if (!anyPaymentMethodFound) {
-            throw new PaymentMethodNotFoundException("PNF-002", "No payment method found by this id");
-        }
-    }
-
-    private void validateRestaurant(final UUID restaurantId) throws RestaurantNotFoundException {
-        restaurantService.restaurantByUUID(restaurantId.toString());
-    }
-
-
-    private void validateOrderedItem(final List<ItemQuantity> itemQuantities) throws ItemNotFoundException {
-        //TODO:
-        ///item/restaurant/{restaurant_id}
-        //itemService.getAllItemsfromResturant()
-        //Compare if item not found throw exception
-    }
-
-    private void updateOrder(final SaveOrderRequest saveOrderRequest) {
-        //TODO:
-    }
 }

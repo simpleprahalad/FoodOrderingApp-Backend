@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
-import java.util.Base64;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -126,4 +126,29 @@ public class UtilityService {
         return customerAuthEntity;
     }
 
+    public Map<String,Integer> getTopCountMap(Map<String,Integer> map, int limit){
+
+        List<Map.Entry<String,Integer>> list = new ArrayList<>(map.entrySet());
+
+        // Sorting in decreasing order
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                return (o2.getValue().compareTo(o1.getValue()));
+            }
+        });
+
+        Map<String, Integer> sortedByValueMap = new HashMap<String, Integer>();
+        int index = 1;
+        for (Map.Entry<String, Integer> item : list) {
+            if(index <= limit) {
+                sortedByValueMap.put(item.getKey(), item.getValue());
+                index++;
+            }
+            else {
+                return sortedByValueMap;
+            }
+        }
+        return sortedByValueMap;
+    }
 }

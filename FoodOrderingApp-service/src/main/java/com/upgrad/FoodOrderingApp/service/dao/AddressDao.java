@@ -4,6 +4,7 @@ import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
@@ -29,4 +30,11 @@ public class AddressDao {
         return addressEntity;
     }
 
+    public AddressEntity getAddressByUuid(String addressId) {
+        try {
+            return entityManager.createNamedQuery("getAddressByUuid", AddressEntity.class).setParameter("uuid", addressId).getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
 }

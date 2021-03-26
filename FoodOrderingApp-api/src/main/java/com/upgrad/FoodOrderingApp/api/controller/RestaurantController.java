@@ -75,7 +75,7 @@ public class RestaurantController {
     }
 
     @RequestMapping(method = RequestMethod.GET,
-            value = "/api/restaurant/{restaurant_id}",
+            value = "/restaurant/{restaurant_id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantDetailsResponse> getRestaurantByUuid(@PathVariable("restaurant_id") final String restaurantId)
             throws RestaurantNotFoundException {
@@ -86,7 +86,7 @@ public class RestaurantController {
     }
 
     @RequestMapping(method = RequestMethod.PUT,
-            path = "/api/restaurant//{restaurant_id}",
+            path = "/restaurant//{restaurant_id}",
             params = "customer_rating",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantDetails(@RequestHeader("authorization") final String authorization,

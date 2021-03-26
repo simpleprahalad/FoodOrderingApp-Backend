@@ -6,45 +6,40 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.UUID;
 
 @Entity
 @Table(name = "coupon")
 @NamedQueries({
         @NamedQuery(name = "getCouponByName", query = "select c from CouponEntity c where c.coupon_name=:coupon_name"),
-        @NamedQuery(name = "getCouponById", query = "select c from CouponEntity c where c.uuid=:coupon_id"),
+        @NamedQuery(name = "getCouponById", query = "select c from CouponEntity c where c.uuid=:uuid"),
 })
 public class CouponEntity implements Serializable {
     @Id
     @Column(name = "id")
-    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "uuid")
+    @Column(name = "uuid", nullable = false)
     @Size(max = 200)
-    @NotNull
-    private UUID uuid;
+    private String uuid;
 
     @Column(name = "coupon_name")
     @Size(max = 255)
     private String coupon_name;
 
-    @Column(name = "percent")
-    @NotNull
+    @Column(name = "percent", nullable = false)
     private Integer percent;
 
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
-
+    
     public String getCouponName() {
         return coupon_name;
     }
@@ -75,5 +70,4 @@ public class CouponEntity implements Serializable {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
-
 }

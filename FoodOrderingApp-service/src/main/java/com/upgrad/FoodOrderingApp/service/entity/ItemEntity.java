@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -14,6 +15,7 @@ import java.util.List;
 @NamedQueries(
         {
                 @NamedQuery(name = "getItems", query = "SELECT i FROM ItemEntity i WHERE i.uuid = :itemUuid order by i.itemName asc "),
+                @NamedQuery(name = "getItemByUuid", query = "SELECT i FROM ItemEntity i WHERE i.uuid = :itemUuid"),
         }
 )
 public class ItemEntity implements Serializable {
@@ -45,7 +47,26 @@ public class ItemEntity implements Serializable {
     @JoinTable(name = "category_item",
             joinColumns = @JoinColumn(name = "item_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private List<ItemEntity> categories = new ArrayList<>();
+    private List<CategoryEntity> categories = new LinkedList<CategoryEntity>();
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderItemEntity> orders = new LinkedList<OrderItemEntity>();
+
+    public List<CategoryEntity> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<CategoryEntity> categories) {
+        this.categories = categories;
+    }
+
+    public List<OrderItemEntity> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<OrderItemEntity> orders) {
+        this.orders = orders;
+    }
 
     public int getId() {
         return id;

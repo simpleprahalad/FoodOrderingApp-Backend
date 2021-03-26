@@ -1,13 +1,12 @@
 package com.upgrad.FoodOrderingApp.service.businness;
 
-import com.upgrad.FoodOrderingApp.service.dao.CategoryDao;
-import com.upgrad.FoodOrderingApp.service.dao.RestaurantDao;
+import com.upgrad.FoodOrderingApp.service.dao.*;
 import com.upgrad.FoodOrderingApp.service.entity.*;
+import com.upgrad.FoodOrderingApp.service.exception.ItemNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ItemService {
@@ -17,6 +16,18 @@ public class ItemService {
 
     @Autowired
     CategoryDao categoryDao;
+
+    @Autowired
+    OrderDao orderDao;
+
+    @Autowired
+    ItemDao itemDao;
+
+    @Autowired
+    OrderItemDao orderItemDao;
+
+    @Autowired
+    private UtilityService utilityService;
 
     public List<ItemEntity> getItemsByCategoryAndRestaurant(String restaurantUuid, String categoryUuid) {
 
@@ -35,5 +46,42 @@ public class ItemService {
             }
         }
         return itemEntities;
+    }
+
+    public ItemEntity getItemByUuid(String itemUuid) throws ItemNotFoundException {
+        ItemEntity item = itemDao.getItemByUuid(itemUuid);
+        if(item == null) {
+            throw new ItemNotFoundException("INF-003", "No item by this id exist");
+        }
+        return item;
+    }
+
+    public List<ItemEntity> getItemsByPopularity(RestaurantEntity restaurantEntity) {
+
+        //Get all orders of the given restaurant
+        List<OrdersEntity> ordersEntities = orderDao.getAllOrdersRestaurantUuid(restaurantEntity.getUuid());
+
+        Map<String,Integer> itemCountHashMap = new HashMap<>();
+        for (OrdersEntity orderedEntity : ordersEntities) {
+            //Get order item entity from order's uuid
+            List<OrderItemEntity> orderItemEntities = orderItemDao.getOrderItemsByOrderUuid(orderedEntity.getUuid());
+            System.out.print("\norder entity"+orderedEntity.getId());
+            for (OrderItemEntity orderItemEntity : orderItemEntities) {
+                System.out.print("\norder item entity"+orderItemEntity.getItem().getItemName());
+                    String itemUUID = orderItemEntity.getItem().getUuid();
+                    Integer count = itemCountHashMap.get(itemUUID);
+                itemCountHashMap.put(itemUUID, (count == null) ? 1 : count + 1);
+            }
+        }
+
+        //Get top 5 items id in map
+        itemCountHashMap =  utilityService.getTopCountMap(itemCountHashMap, 5);
+
+        //Populate items from the saved uuid of items
+        List<ItemEntity> popularItems = new ArrayList<>();
+        for (String id : itemCountHashMap.keySet()) {
+            popularItems.add(itemDao.getItemByUuid(id));
+        }
+        return popularItems;
     }
 }
