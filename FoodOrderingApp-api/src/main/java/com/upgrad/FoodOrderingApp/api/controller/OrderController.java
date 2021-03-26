@@ -1,7 +1,9 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
-import com.upgrad.FoodOrderingApp.service.businness.*;
+import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
+import com.upgrad.FoodOrderingApp.service.businness.ItemService;
+import com.upgrad.FoodOrderingApp.service.businness.OrderService;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,7 +25,7 @@ import java.util.stream.Stream;
 public class OrderController {
 
     @Autowired
-    private UtilityService utilityService;
+    private CustomerService customerService;
 
     @Autowired
     private OrderService orderService;
@@ -39,7 +43,7 @@ public class OrderController {
 
         //Validate customer state
         String accessToken = authorization.split("Bearer ")[1];
-        utilityService.validateAccessToken(accessToken);
+        customerService.validateAccessToken(accessToken);
 
         final CouponEntity coupon = orderService.getCouponByCouponName(couponName);
         CouponDetailsResponse couponDetailsResponse = new CouponDetailsResponse();
@@ -62,7 +66,7 @@ public class OrderController {
 
         //Validate customer state
         String accessToken = authorization.split("Bearer ")[1];
-        final CustomerEntity customer = utilityService.validateAccessToken(accessToken).getCustomer();
+        final CustomerEntity customer = customerService.validateAccessToken(accessToken).getCustomer();
 
         String addressUuid = saveOrderRequest.getAddressId();
         String paymentUuid = saveOrderRequest.getPaymentId().toString();
@@ -74,7 +78,7 @@ public class OrderController {
         OrdersEntity order = orderService.saveOrder(bill, couponUuid, discount, paymentUuid, customer, addressUuid, restaurantUuid);
 
         //Populating order
-        for (ItemQuantity itemQuantity: saveOrderRequest.getItemQuantities()){
+        for (ItemQuantity itemQuantity : saveOrderRequest.getItemQuantities()) {
             OrderItemEntity orderItemEntity = new OrderItemEntity();
             orderItemEntity.setOrder(order);
             ItemEntity item = itemService.getItemByUuid(itemQuantity.getItemId().toString());
@@ -101,7 +105,7 @@ public class OrderController {
         String accessToken = authorization.split("Bearer ")[1];
 
         //Validate customer state and get it.
-        final CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
+        final CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
         final CustomerEntity customer = customerAuthEntity.getCustomer();
 
         final List<OrderList> orderList = orderService.getAllOrdersOfCustomer(customer)

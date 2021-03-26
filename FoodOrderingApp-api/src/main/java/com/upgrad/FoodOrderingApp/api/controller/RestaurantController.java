@@ -2,9 +2,9 @@ package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.CategoryService;
+import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
 import com.upgrad.FoodOrderingApp.service.businness.ItemService;
 import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
-import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
@@ -35,7 +35,7 @@ public class RestaurantController {
     ItemService itemService;
 
     @Autowired
-    UtilityService utilityService;
+    CustomerService customerService;
 
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant",
@@ -95,7 +95,7 @@ public class RestaurantController {
             throws AuthorizationFailedException, RestaurantNotFoundException, InvalidRatingException {
         //Validate authorization code
         String accessToken = authorization.split("Bearer ")[1];
-        utilityService.validateAccessToken(accessToken);
+        customerService.validateAccessToken(accessToken);
 
         //Get restaurant entity from restaurant id
         RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantUuid);

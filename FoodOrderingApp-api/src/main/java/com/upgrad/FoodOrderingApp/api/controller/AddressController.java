@@ -2,7 +2,7 @@ package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.AddressBusinessService;
-import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
+import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 public class AddressController {
 
     @Autowired
-    private UtilityService utilityService;
+    private CustomerService customerService;
 
     @Autowired
     AddressBusinessService addressBusinessService;
@@ -44,7 +44,7 @@ public class AddressController {
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
 
-        CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
+        CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
         CustomerEntity customer = customerAuthEntity.getCustomer();
         String flatBuildingName = saveAddressRequest.getFlatBuildingName();
         String locality = saveAddressRequest.getLocality();
@@ -65,7 +65,7 @@ public class AddressController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public List<AddressList> saveAddress(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
         String accessToken = authorization.split("Bearer ")[1];
-        CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
+        CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
         CustomerEntity customer = customerAuthEntity.getCustomer();
 
         List<AddressEntity> addresses = customer.getAddresses();
@@ -97,7 +97,7 @@ public class AddressController {
                                                                @PathVariable("address_id") final String addressId)
             throws AuthorizationFailedException, AddressNotFoundException {
         final String accessToken = authorization.split("Bearer ")[1];
-        final CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
+        final CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
         final CustomerEntity customer = customerAuthEntity.getCustomer();
 
         final String deletedAddressUuid = addressBusinessService.deleteAddress(customer, addressId);

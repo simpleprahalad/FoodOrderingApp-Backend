@@ -75,7 +75,7 @@ public class ItemService {
         }
 
         //Get top 5 items id in map
-        itemCountHashMap =  utilityService.getTopCountMap(itemCountHashMap, 5);
+        itemCountHashMap =  getTopCountMap(itemCountHashMap, 5);
 
         //Populate items from the saved uuid of items
         List<ItemEntity> popularItems = new ArrayList<>();
@@ -83,5 +83,31 @@ public class ItemService {
             popularItems.add(itemDao.getItemByUuid(id));
         }
         return popularItems;
+    }
+
+    private Map<String,Integer> getTopCountMap(Map<String,Integer> map, int limit){
+
+        List<Map.Entry<String,Integer>> list = new ArrayList<>(map.entrySet());
+
+        // Sorting in decreasing order
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                return (o2.getValue().compareTo(o1.getValue()));
+            }
+        });
+
+        Map<String, Integer> sortedByValueMap = new HashMap<String, Integer>();
+        int index = 1;
+        for (Map.Entry<String, Integer> item : list) {
+            if(index <= limit) {
+                sortedByValueMap.put(item.getKey(), item.getValue());
+                index++;
+            }
+            else {
+                return sortedByValueMap;
+            }
+        }
+        return sortedByValueMap;
     }
 }
