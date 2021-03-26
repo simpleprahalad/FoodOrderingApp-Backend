@@ -2,6 +2,7 @@ package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.AddressService;
+import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
 import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
@@ -33,6 +34,9 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
+    @Autowired
+    private CustomerService customerService;
+
     @RequestMapping(
             method = RequestMethod.POST,
             value = "/address",
@@ -43,9 +47,7 @@ public class AddressController {
             throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
-
-        CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
-        CustomerEntity customerEntity = customerAuthEntity.getCustomer();
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
 
         final AddressEntity addressEntity = new AddressEntity();
         addressEntity.setUuid(UUID.randomUUID().toString());
@@ -59,7 +61,7 @@ public class AddressController {
         final SaveAddressResponse saveAddressResponse = new SaveAddressResponse()
                 .id(savedAddress.getUuid())
                 .status("ADDRESS SUCCESSFULLY REGISTERED");
-        return new ResponseEntity<>(saveAddressResponse, HttpStatus.OK);
+        return new ResponseEntity<>(saveAddressResponse, HttpStatus.CREATED);
     }
 
     @RequestMapping(
