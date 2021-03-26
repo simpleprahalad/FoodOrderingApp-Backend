@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.Base64;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,55 +29,6 @@ public class CustomerService {
 
     @Autowired
     PasswordCryptographyProvider passwordCryptographyProvider; //Provides coding and decoding for the password
-
-    //To validate the Authorization format
-    public boolean isValidAuthorizationFormat(String authorization) throws AuthenticationFailedException {
-        try {
-            byte[] decoded = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
-            String decodedAuth = new String(decoded);
-            String[] decodedArray = decodedAuth.split(":");
-            String username = decodedArray[0];
-            String password = decodedArray[1];
-            return true;
-        } catch (ArrayIndexOutOfBoundsException exc) {
-            throw new AuthenticationFailedException("ATH-003", "Incorrect format of decoded customer name and password");
-        }
-    }
-
-    //To validate Customer update request
-    public boolean isValidUpdateCustomerRequest(String firstName) throws UpdateCustomerException {
-        if (firstName == null || firstName == "") {
-            throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
-        }
-        return true;
-    }
-
-    //To validate the password Update Request.
-    public void isValidUpdatePasswordRequest(String oldPassword, String newPassword) throws UpdateCustomerException {
-        if (oldPassword == null || oldPassword == "") {
-            throw new UpdateCustomerException("UCR-003", "No field should be empty");
-        }
-        if (newPassword == null || newPassword == "") {
-            throw new UpdateCustomerException("UCR-003", "No field should be empty");
-        }
-        return;
-    }
-
-    public boolean isValidSignupRequest(CustomerEntity customerEntity) throws SignUpRestrictedException {
-        if (customerEntity.getFirstName() == null || customerEntity.getFirstName() == "") {
-            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
-        }
-        if (customerEntity.getPassword() == null || customerEntity.getPassword() == "") {
-            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
-        }
-        if (customerEntity.getEmail() == null || customerEntity.getEmail() == "") {
-            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
-        }
-        if (customerEntity.getContactnumber() == null || customerEntity.getContactnumber() == "") {
-            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
-        }
-        return true;
-    }
 
     private boolean isPasswordWeak(String password) {
         // Regex to check valid password.
@@ -149,10 +99,6 @@ public class CustomerService {
 
         if (existingCustomerEntity != null) {//Checking if Customer already Exists if yes throws exception.
             throw new SignUpRestrictedException("SGR-001", "This contact number is already registered! Try other contact number");
-        }
-
-        if (!isValidSignupRequest(customerEntity)) {//Checking if is Valid Signup Request.
-            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
         }
 
         if (!isEmailValid(customerEntity.getEmail())) {//Checking if email is valid
