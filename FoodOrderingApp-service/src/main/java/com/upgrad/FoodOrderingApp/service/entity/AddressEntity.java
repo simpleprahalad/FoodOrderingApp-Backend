@@ -20,6 +20,8 @@ import java.util.List;
         {
                 @NamedQuery(name = "getAddressesByCustomerUuid", query = "SELECT distinct a FROM AddressEntity a " +
                         "join a.customers c where c.uuid=:customerUuid"),
+
+                @NamedQuery(name = "getAddressByUuid", query = "select  a FROM AddressEntity a where a.uuid=:uuid")
         }
 )
 public class AddressEntity implements Serializable {

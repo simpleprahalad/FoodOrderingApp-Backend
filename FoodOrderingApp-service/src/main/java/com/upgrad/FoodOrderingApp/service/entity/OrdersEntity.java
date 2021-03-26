@@ -11,6 +11,8 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -23,7 +25,6 @@ import java.util.Date;
 public class OrdersEntity implements Serializable {
     @Id
     @Column(name = "id")
-    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -36,7 +37,7 @@ public class OrdersEntity implements Serializable {
     @NotNull
     private BigDecimal bill;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coupon_id", nullable = true)
     private CouponEntity coupon;
 
@@ -63,6 +64,39 @@ public class OrdersEntity implements Serializable {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
 
+    @OneToMany(mappedBy = "item")
+    private List<OrderItemEntity> items;
+
+    public void addOrderItem(OrderItemEntity orderItemEntity) {
+        if(this.items == null){
+            this.items = new LinkedList<OrderItemEntity>();
+        }
+        this.items.add(orderItemEntity);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public List<OrderItemEntity> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItemEntity> items) {
+        this.items = items;
+    }
 
     public Date getDate() {
         return date;
@@ -127,7 +161,7 @@ public class OrdersEntity implements Serializable {
     public void setDiscount(BigDecimal discount) {
         this.discount = discount;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         return new EqualsBuilder().append(this, obj).isEquals();

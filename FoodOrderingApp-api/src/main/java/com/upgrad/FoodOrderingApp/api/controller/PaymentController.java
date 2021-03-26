@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping
@@ -38,7 +39,7 @@ public class PaymentController {
 
         for (PaymentEntity paymentEntity : paymentEntities) {
             final PaymentResponse paymentType = new PaymentResponse();
-            paymentType.setId(paymentEntity.getUuid());
+            paymentType.setId(UUID.fromString(paymentEntity.getUuid()));
             paymentType.setPaymentName(paymentEntity.getPaymentName());
             paymentListResponse.addPaymentMethodsItem(paymentType);
         }

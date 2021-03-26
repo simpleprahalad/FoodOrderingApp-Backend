@@ -11,25 +11,20 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "order_item")
-@NamedQueries(
-        {
-
-        }
-)
 public class OrderItemEntity implements Serializable {
+
     @Id
     @Column(name = "id")
-    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "order_id")
-    @NotNull
-    private Integer order_id;
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private OrdersEntity order;
 
-    @Column(name = "item_id")
-    @NotNull
-    private Integer item_id;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private ItemEntity item;
 
     @Column(name = "quantity")
     @NotNull
@@ -38,6 +33,46 @@ public class OrderItemEntity implements Serializable {
     @Column(name = "price")
     @NotNull
     private Integer price;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public OrdersEntity getOrder() {
+        return order;
+    }
+
+    public void setOrder(OrdersEntity order) {
+        this.order = order;
+    }
+
+    public ItemEntity getItem() {
+        return item;
+    }
+
+    public void setItem(ItemEntity item) {
+        this.item = item;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
 
     @Override
     public boolean equals(Object obj) {
