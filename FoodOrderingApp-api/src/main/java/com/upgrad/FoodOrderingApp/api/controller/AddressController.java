@@ -1,8 +1,7 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
-import com.upgrad.FoodOrderingApp.service.businness.AddressService;
-import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
+import com.upgrad.FoodOrderingApp.service.businness.AddressBusinessService;
 import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
@@ -29,13 +28,10 @@ import java.util.stream.Stream;
 public class AddressController {
 
     @Autowired
-    private UtilityService utilityService;
+    private CustomerService customerService;
 
     @Autowired
     private AddressService addressService;
-
-    @Autowired
-    private CustomerService customerService;
 
     @RequestMapping(
             method = RequestMethod.POST,
@@ -47,7 +43,8 @@ public class AddressController {
             throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
-        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
+        CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
+        CustomerEntity customer = customerAuthEntity.getCustomer();
 
         final AddressEntity addressEntity = new AddressEntity();
         addressEntity.setUuid(UUID.randomUUID().toString());
@@ -68,9 +65,9 @@ public class AddressController {
             method = RequestMethod.GET,
             value = "/address/customer",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AddressListResponse> getAddressOfCustomer(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+    public List<AddressList> saveAddress(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
         String accessToken = authorization.split("Bearer ")[1];
-        CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
+        CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
         CustomerEntity customer = customerAuthEntity.getCustomer();
 
         final List<AddressEntity> addresses = addressService.getAllAddress(customer);
@@ -101,7 +98,7 @@ public class AddressController {
                                                                @PathVariable("address_id") final String addressId)
             throws AuthorizationFailedException, AddressNotFoundException {
         final String accessToken = authorization.split("Bearer ")[1];
-        final CustomerAuthEntity customerAuthEntity = utilityService.validateAccessToken(accessToken);
+        final CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
         final CustomerEntity customer = customerAuthEntity.getCustomer();
 
         final AddressEntity addressToBeDeleted = addressService.getAddressByUUID(addressId, customer);
