@@ -26,9 +26,6 @@ public class ItemService {
     @Autowired
     OrderItemDao orderItemDao;
 
-    @Autowired
-    private UtilityService utilityService;
-
     public List<ItemEntity> getItemsByCategoryAndRestaurant(String restaurantUuid, String categoryUuid) {
 
         //Get RestaurantEntity from restaurant id
