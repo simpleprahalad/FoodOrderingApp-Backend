@@ -2,7 +2,6 @@ package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
-import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
@@ -24,11 +23,7 @@ import java.util.UUID;
 public class CustomerController {
 
     @Autowired
-    private UtilityService utilityService;
-
-    @Autowired
     private CustomerService customerService;
-
 
     /**
      * @param signupCustomerRequest
@@ -52,7 +47,7 @@ public class CustomerController {
         customerEntity.setPassword(signupCustomerRequest.getPassword());
         customerEntity.setContactnumber(signupCustomerRequest.getContactNumber());
 
-        utilityService.isValidSignupRequest(customerEntity);
+        isValidSignupRequest(customerEntity);
 
         final CustomerEntity createdCustomerEntity = customerService.saveCustomer(customerEntity);
 
@@ -70,7 +65,7 @@ public class CustomerController {
     public ResponseEntity<LoginResponse> login(@RequestHeader("authorization") final String authorization)
             throws AuthenticationFailedException {
         // Basic authentication format validation
-        utilityService.isValidAuthorizationFormat(authorization);
+        isValidAuthorizationFormat(authorization);
 
         //Separating the username and password after decoding using Base64 decoder
         byte[] decoded = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
@@ -119,11 +114,12 @@ public class CustomerController {
             @RequestHeader("authorization") final String authorization,
             @RequestBody(required = false) UpdateCustomerRequest updateCustomerRequest)
             throws UpdateCustomerException, AuthorizationFailedException {
-        utilityService.isValidUpdateCustomerRequest(updateCustomerRequest.getFirstName());
+
+        isValidUpdateCustomerRequest(updateCustomerRequest.getFirstName());
 
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
-        utilityService.validateAccessToken(accessToken);
+        customerService.validateAccessToken(accessToken);
 
         CustomerEntity customerEntityToBeUpdated = customerService.getCustomer(accessToken);
 
@@ -154,11 +150,16 @@ public class CustomerController {
         String oldPassword = updatePasswordRequest.getOldPassword();
         String newPassword = updatePasswordRequest.getNewPassword();
 
-        utilityService.isValidUpdatePasswordRequest(oldPassword, newPassword);
+        if (oldPassword == null || oldPassword == "") {
+            throw new UpdateCustomerException("UCR-003", "No field should be empty");
+        }
+        if (newPassword == null || newPassword == "") {
+            throw new UpdateCustomerException("UCR-003", "No field should be empty");
+        }
 
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
-        utilityService.validateAccessToken(accessToken);
+        customerService.validateAccessToken(accessToken);
 
         CustomerEntity customerEntityToBeUpdated = customerService.getCustomer(accessToken);
 
@@ -176,4 +177,43 @@ public class CustomerController {
 
         return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, null, HttpStatus.OK);
     }
+
+    //To validate the Authorization format
+    private boolean isValidAuthorizationFormat(String authorization) throws AuthenticationFailedException {
+        try {
+            byte[] decoded = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
+            String decodedAuth = new String(decoded);
+            String[] decodedArray = decodedAuth.split(":");
+            String username = decodedArray[0];
+            String password = decodedArray[1];
+            return true;
+        } catch (ArrayIndexOutOfBoundsException exc) {
+            throw new AuthenticationFailedException("ATH-003", "Incorrect format of decoded customer name and password");
+        }
+    }
+
+
+    private boolean isValidUpdateCustomerRequest(String firstName) throws UpdateCustomerException {
+        if (firstName == null || firstName == "") {
+            throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
+        }
+        return true;
+    }
+
+    private boolean isValidSignupRequest(CustomerEntity customerEntity) throws SignUpRestrictedException {
+        if (customerEntity.getFirstName() == null || customerEntity.getFirstName() == "") {
+            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+        }
+        if (customerEntity.getPassword() == null || customerEntity.getPassword() == "") {
+            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+        }
+        if (customerEntity.getEmail() == null || customerEntity.getEmail() == "") {
+            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+        }
+        if (customerEntity.getContactnumber() == null || customerEntity.getContactnumber() == "") {
+            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+        }
+        return true;
+    }
+
 }
