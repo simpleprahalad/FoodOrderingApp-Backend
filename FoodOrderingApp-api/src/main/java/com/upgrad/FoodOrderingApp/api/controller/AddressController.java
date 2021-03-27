@@ -44,14 +44,12 @@ public class AddressController {
         String accessToken = authorization.split("Bearer ")[1];
         CustomerEntity customerEntity = customerService.getCustomer(accessToken);
 
-        final AddressEntity addressEntity = new AddressEntity();
-        addressEntity.setUuid(UUID.randomUUID().toString());
-        addressEntity.setFlatBuilNo(saveAddressRequest.getFlatBuildingName());
-        addressEntity.setLocality(saveAddressRequest.getLocality());
-        addressEntity.setCity(saveAddressRequest.getCity());
-        addressEntity.setPincode(saveAddressRequest.getPincode());
-        addressEntity.setState(addressService.getStateByUUID(saveAddressRequest.getStateUuid()));
-
+        final AddressEntity addressEntity = new AddressEntity(UUID.randomUUID().toString(),
+                saveAddressRequest.getFlatBuildingName(),
+                saveAddressRequest.getLocality(),
+                saveAddressRequest.getCity(),
+                saveAddressRequest.getPincode(),
+                addressService.getStateByUUID(saveAddressRequest.getStateUuid()));
         final AddressEntity savedAddress = addressService.saveAddress(customerEntity, addressEntity);
         final SaveAddressResponse saveAddressResponse = new SaveAddressResponse()
                 .id(savedAddress.getUuid())

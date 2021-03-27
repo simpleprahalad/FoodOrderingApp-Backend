@@ -109,7 +109,7 @@ public class OrderController {
         customerService.validateAccessToken(accessToken);
         final CustomerEntity customer = customerService.getCustomer(accessToken);
 
-        final List<OrderList> orderList = orderService.getAllOrdersOfCustomer(customer)
+        final List<OrderList> orderList = orderService.getOrdersByCustomers(customer)
                 .stream()
                 .sorted(Comparator.comparing(OrderEntity::getDate)) //Reorder based on date of order creation
                 .flatMap((Function<OrderEntity, Stream<OrderList>>) ordersEntity -> Stream.of(prepareOrderListObject(ordersEntity)))

@@ -91,8 +91,8 @@ public class OrderService {
         return coupon;
     }
 
-    public List<OrderEntity> getAllOrdersOfCustomer(final CustomerEntity customerEntity) {
-        return orderDao.getAllOrdersOfCustomerByUuid(customerEntity.getUuid());
+    public List<OrderEntity> getOrdersByCustomers(final String customerUuid) {
+        return orderDao.getAllOrdersOfCustomerByUuid(customerUuid);
     }
 
     @Transactional

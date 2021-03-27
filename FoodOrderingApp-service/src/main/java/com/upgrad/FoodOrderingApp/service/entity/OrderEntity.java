@@ -65,6 +65,21 @@ public class OrderEntity implements Serializable {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
 
+    public OrderEntity() {}
+
+    public OrderEntity(String orderId, BigDecimal bill, CouponEntity couponEntity, BigDecimal discount,
+                       Date date, PaymentEntity paymentEntity, CustomerEntity customerEntity, AddressEntity addressEntity, RestaurantEntity restaurantEntity) {
+        this.uuid = orderId;
+        this.bill = bill;
+        this.coupon = couponEntity;
+        this.discount = discount;
+        this.date = date;
+        this.payment = paymentEntity;
+        this.customer = customerEntity;
+        this.address = addressEntity;
+        this.restaurant = restaurantEntity;
+    }
+
     public Integer getId() {
         return id;
     }
