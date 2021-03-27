@@ -188,7 +188,7 @@ public class RestaurantController {
                 .id(UUID.fromString(stateEntity.getUuid()));
         RestaurantDetailsResponseAddress restaurantDetailsResponseAddress = new RestaurantDetailsResponseAddress()
                 .id(UUID.fromString(addressEntity.getUuid()))
-                .flatBuildingName(addressEntity.getFlatBuildingName())
+                .flatBuildingName(addressEntity.getFlatBuilNo())
                 .locality(addressEntity.getLocality())
                 .city(addressEntity.getCity())
                 .pincode(addressEntity.getPincode())

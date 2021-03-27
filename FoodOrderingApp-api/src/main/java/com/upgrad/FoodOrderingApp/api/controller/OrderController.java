@@ -66,7 +66,8 @@ public class OrderController {
 
         //Validate customer state
         String accessToken = authorization.split("Bearer ")[1];
-        final CustomerEntity customer = customerService.validateAccessToken(accessToken).getCustomer();
+        customerService.validateAccessToken(accessToken);
+        final CustomerEntity customer = customerService.getCustomer(accessToken);
 
         String addressUuid = saveOrderRequest.getAddressId();
         String paymentUuid = saveOrderRequest.getPaymentId().toString();
@@ -105,8 +106,8 @@ public class OrderController {
         String accessToken = authorization.split("Bearer ")[1];
 
         //Validate customer state and get it.
-        final CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
-        final CustomerEntity customer = customerAuthEntity.getCustomer();
+        customerService.validateAccessToken(accessToken);
+        final CustomerEntity customer = customerService.getCustomer(accessToken);
 
         final List<OrderList> orderList = orderService.getAllOrdersOfCustomer(customer)
                 .stream()
@@ -136,7 +137,7 @@ public class OrderController {
     private OrderListAddress prepareOrderListAddress(final AddressEntity address) {
         final OrderListAddress orderListAddress = new OrderListAddress();
         orderListAddress.city(address.getCity());
-        orderListAddress.flatBuildingName(address.getFlatBuildingName());
+        orderListAddress.flatBuildingName(address.getFlatBuilNo());
         orderListAddress.id(UUID.fromString(address.getUuid()));
         orderListAddress.locality(address.getLocality());
         orderListAddress.pincode(address.getPincode());
