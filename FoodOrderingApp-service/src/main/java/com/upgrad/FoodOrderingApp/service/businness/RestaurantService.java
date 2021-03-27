@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +36,9 @@ public class RestaurantService {
      * @return List of all restaurants by entered input order by restaurant name
      */
     public List<RestaurantEntity> restaurantsByName(final String restaurantName)
-    throws RestaurantNotFoundException {
+            throws RestaurantNotFoundException {
         //If the restaurant name field entered by the customer is empty, throw exception
-        if(restaurantName == null || restaurantName == "") {
+        if (restaurantName == null || restaurantName == "") {
             throw new RestaurantNotFoundException("RNF-003", "Restaurant name field should not be empty");
         }
 
@@ -47,10 +46,9 @@ public class RestaurantService {
         List<RestaurantEntity> restaurantEntities = restaurantDao.getRestaurantByName(restaurantName);
 
         //If there are no restaurants by the name entered by the customer, return an empty list
-        if(restaurantEntities == null) {
+        if (restaurantEntities == null) {
             return new ArrayList<>();
-        }
-        else {
+        } else {
             return restaurantEntities;
         }
     }
@@ -80,7 +78,7 @@ public class RestaurantService {
     public RestaurantEntity restaurantByUUID(final String restaurantId)
             throws RestaurantNotFoundException {
         //If the restaurant id field entered by the customer is empty, throw exception
-        if(restaurantId == null) {
+        if (restaurantId == null) {
             throw new RestaurantNotFoundException("RNF-002", "Restaurant id field should not be empty");
         }
 
@@ -88,10 +86,9 @@ public class RestaurantService {
         RestaurantEntity restaurantEntity = restaurantDao.getRestaurantByUuid(restaurantId);
 
         //If there are no restaurants by the id entered by the customer, return an empty list
-        if(restaurantEntity == null) {
+        if (restaurantEntity == null) {
             throw new RestaurantNotFoundException("RNF-001", "No restaurant by this id");
-        }
-        else {
+        } else {
             return restaurantEntity;
         }
     }
@@ -99,30 +96,26 @@ public class RestaurantService {
     @Transactional(propagation = Propagation.REQUIRED)
     public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurantEntity, Double customerRating)
             throws InvalidRatingException {
+
         //Checking the validity of customer rating
-        if(customerRating == null || !(customerRating >= 1 && customerRating <= 5)){
-            throw new InvalidRatingException("IRE-001","Restaurant should be in the range of 1 to 5");
+        if (customerRating == null || !(customerRating >= 1 && customerRating <= 5)) {
+            throw new InvalidRatingException("IRE-001", "Restaurant should be in the range of 1 to 5");
         }
 
-        float oldRestaurantRating = (float) restaurantEntity.getCustomerRating();
+        double oldRestaurantRating = restaurantEntity.getCustomerRating();
         Integer oldCustomersRatingCount = restaurantEntity.getNumberCustomersRated();
         //Update number of customer rated
-        restaurantEntity.setNumberCustomersRated(oldCustomersRatingCount+1);
+        restaurantEntity.setNumberCustomersRated(oldCustomersRatingCount + 1);
 
         /**
          * Calculate avg customer rating
          * New Average rating = (Old average Rating * Old count + NewRating)/NewRatingCount
          * **/
-        float newCustomerRating = (float)((oldRestaurantRating * oldCustomersRatingCount) + customerRating) / (oldCustomersRatingCount + 1);
-        DecimalFormat df = new DecimalFormat("#.#");
-        restaurantEntity.setCustomerRating(Float.parseFloat(df.format(newCustomerRating)));
+        Double newCustomerRating = ((oldRestaurantRating * oldCustomersRatingCount) + customerRating) / (oldCustomersRatingCount + 1);
+        restaurantEntity.setCustomerRating(newCustomerRating);
 
         //Updating restaurant rating
         RestaurantEntity updatedRestaurantEntity = restaurantDao.updateRestaurantRating(restaurantEntity);
-
         return updatedRestaurantEntity;
-
     }
-
-
 }

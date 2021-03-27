@@ -46,11 +46,11 @@ public class RestaurantEntity implements Serializable {
 
     @Column(name = "average_price_for_two")
     @NotNull
-    private int averagePriceForTwo;
+    private Integer averagePriceForTwo;
 
     @Column(name = "number_of_customers_rated")
     @NotNull
-    private int numberOfCustomersRated;
+    private Integer numberOfCustomersRated;
 
     @OneToOne
     @JoinColumn(name = "address_id", referencedColumnName = "id")
@@ -67,14 +67,6 @@ public class RestaurantEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     @OrderBy("categoryName asc")
     private List<CategoryEntity> categories = new ArrayList<>();
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getUuid() {
         return uuid;
@@ -98,30 +90,6 @@ public class RestaurantEntity implements Serializable {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
-    }
-
-    public double getCustomerRating() {
-        return customerRating;
-    }
-
-    public void setCustomerRating(double customerRating) {
-        this.customerRating = customerRating;
-    }
-
-    public int getAvgPrice() {
-        return averagePriceForTwo;
-    }
-
-    public void setAvgPrice(int averagePriceForTwo) {
-        this.averagePriceForTwo = averagePriceForTwo;
-    }
-
-    public int getNumberCustomersRated() {
-        return numberOfCustomersRated;
-    }
-
-    public void setNumberCustomersRated(int numberOfCustomersRated) {
-        this.numberOfCustomersRated = numberOfCustomersRated;
     }
 
     public AddressEntity getAddress() {
@@ -158,8 +126,51 @@ public class RestaurantEntity implements Serializable {
         return new HashCodeBuilder().append(this).hashCode();
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getNumberCustomersRated() {
+        return numberOfCustomersRated;
+    }
+
+    public void setNumberCustomersRated(Integer numberOfCustomersRated) {
+        this.numberOfCustomersRated = numberOfCustomersRated;
+    }
+
+    public Integer getAvgPrice() {
+        return averagePriceForTwo;
+    }
+
+    public void setAvgPrice(Integer averagePriceForTwo) {
+        this.averagePriceForTwo = averagePriceForTwo;
+    }
+
+    public double getCustomerRating() {
+        return customerRating;
+    }
+
+    public void setCustomerRating(double customerRating) {
+        this.customerRating = customerRating;
+    }
+
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+        return "RestaurantEntity{" +
+                "id=" + id +
+                ", uuid='" + uuid + '\'' +
+                ", restaurantName='" + restaurantName + '\'' +
+                ", photoUrl='" + photoUrl + '\'' +
+                ", customerRating=" + customerRating +
+                ", averagePriceForTwo=" + averagePriceForTwo +
+                ", numberOfCustomersRated=" + numberOfCustomersRated +
+                ", address=" + address +
+                ", items=" + items +
+                ", categories=" + categories +
+                '}';
     }
 }
