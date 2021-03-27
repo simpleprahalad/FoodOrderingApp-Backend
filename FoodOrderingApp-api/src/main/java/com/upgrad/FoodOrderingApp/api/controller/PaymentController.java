@@ -43,7 +43,8 @@ public class PaymentController {
             paymentType.setPaymentName(paymentEntity.getPaymentName());
             paymentListResponse.addPaymentMethodsItem(paymentType);
         }
-        
+
         return paymentListResponse;
     }
+
 }

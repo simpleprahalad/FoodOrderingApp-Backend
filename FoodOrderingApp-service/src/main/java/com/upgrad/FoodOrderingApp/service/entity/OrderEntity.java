@@ -9,10 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -36,14 +33,14 @@ public class OrderEntity implements Serializable {
 
     @Column(name = "bill")
     @NotNull
-    private BigDecimal bill;
+    private Double bill;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coupon_id", nullable = true)
     private CouponEntity coupon;
 
     @Column(name = "discount")
-    private BigDecimal discount;
+    private Double discount;
 
     @Column(name = "date")
     @NotNull
@@ -65,9 +62,10 @@ public class OrderEntity implements Serializable {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
 
-    public OrderEntity() {}
+    public OrderEntity() {
+    }
 
-    public OrderEntity(String orderId, BigDecimal bill, CouponEntity couponEntity, BigDecimal discount,
+    public OrderEntity(String orderId, Double bill, CouponEntity couponEntity, Double discount,
                        Date date, PaymentEntity paymentEntity, CustomerEntity customerEntity, AddressEntity addressEntity, RestaurantEntity restaurantEntity) {
         this.uuid = orderId;
         this.bill = bill;
@@ -144,19 +142,19 @@ public class OrderEntity implements Serializable {
         this.restaurant = restaurant;
     }
 
-    public BigDecimal getBill() {
+    public Double getBill() {
         return bill;
     }
 
-    public void setBill(BigDecimal bill) {
+    public void setBill(Double bill) {
         this.bill = bill;
     }
 
-    public BigDecimal getDiscount() {
+    public Double getDiscount() {
         return discount;
     }
 
-    public void setDiscount(BigDecimal discount) {
+    public void setDiscount(Double discount) {
         this.discount = discount;
     }
 

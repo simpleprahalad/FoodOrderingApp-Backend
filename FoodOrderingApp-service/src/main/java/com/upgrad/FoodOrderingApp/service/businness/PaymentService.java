@@ -16,4 +16,8 @@ public class PaymentService {
     public List<PaymentEntity> getAllPaymentMethods() {
         return paymentDao.getAllPaymentMethods();
     }
+
+    public PaymentEntity getPaymentByUUID(final String paymentId) {
+        return paymentDao.getPaymentByUuid(paymentId);
+    }
 }

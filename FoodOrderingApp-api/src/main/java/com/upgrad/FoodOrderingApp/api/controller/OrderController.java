@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -70,12 +69,14 @@ public class OrderController {
 
         String addressUuid = saveOrderRequest.getAddressId();
         String paymentUuid = saveOrderRequest.getPaymentId().toString();
-        BigDecimal bill = saveOrderRequest.getBill();
-        BigDecimal discount = saveOrderRequest.getDiscount();
+        Double bill = saveOrderRequest.getBill().doubleValue();
+        Double discount = saveOrderRequest.getDiscount().doubleValue();
         String couponUuid = saveOrderRequest.getCouponId().toString();
         String restaurantUuid = saveOrderRequest.getRestaurantId().toString();
 
-        OrderEntity order = orderService.saveOrder(bill, couponUuid, discount, paymentUuid, customer, addressUuid, restaurantUuid);
+        OrderEntity order = orderService.makeOrder(bill,
+                couponUuid, discount, paymentUuid, customer, addressUuid, restaurantUuid);
+        orderService.saveOrder(order);
 
         //Populating order
         for (ItemQuantity itemQuantity : saveOrderRequest.getItemQuantities()) {
@@ -107,7 +108,7 @@ public class OrderController {
         //Validate customer state and get it.
         final CustomerEntity customer = customerService.getCustomer(accessToken);
 
-        final List<OrderList> orderList = orderService.getOrdersByCustomers(customer)
+        final List<OrderList> orderList = orderService.getOrdersByCustomers(customer.getUuid())
                 .stream()
                 .sorted(Comparator.comparing(OrderEntity::getDate)) //Reorder based on date of order creation
                 .flatMap((Function<OrderEntity, Stream<OrderList>>) ordersEntity -> Stream.of(prepareOrderListObject(ordersEntity)))

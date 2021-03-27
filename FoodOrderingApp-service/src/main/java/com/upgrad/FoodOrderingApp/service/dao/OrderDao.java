@@ -30,8 +30,8 @@ public class OrderDao {
         }
     }
 
-    public String saveOrder(OrderEntity order) {
+    public OrderEntity saveOrder(OrderEntity order) {
         entityManager.persist(order);
-        return order.getUuid();
+        return order;
     }
 }
