@@ -62,8 +62,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public void validateAccessToken(final String accessToken) throws AuthorizationFailedException {
-
+    public CustomerEntity getCustomer(final String accessToken) throws AuthorizationFailedException {
         CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
 
         //Checking if Customer not logged In
@@ -84,10 +83,6 @@ public class CustomerService {
             throw new AuthorizationFailedException("ATHR-003",
                     "Your session is expired. Log in again to access this endpoint.");
         }
-    }
-
-    public CustomerEntity getCustomer(final String accessToken) throws AuthorizationFailedException {
-        CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
         return customerAuthEntity.getCustomer();
     }
 

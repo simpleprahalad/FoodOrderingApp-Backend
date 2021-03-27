@@ -95,7 +95,7 @@ public class RestaurantController {
             throws AuthorizationFailedException, RestaurantNotFoundException, InvalidRatingException {
         //Validate authorization code
         String accessToken = authorization.split("Bearer ")[1];
-        customerService.validateAccessToken(accessToken);
+        customerService.getCustomer(accessToken);
 
         //Get restaurant entity from restaurant id
         RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantUuid);

@@ -119,8 +119,6 @@ public class CustomerController {
 
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
-        customerService.validateAccessToken(accessToken);
-
         CustomerEntity customerEntityToBeUpdated = customerService.getCustomer(accessToken);
 
         customerEntityToBeUpdated.setFirstName(updateCustomerRequest.getFirstName());
@@ -159,8 +157,6 @@ public class CustomerController {
 
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
-        customerService.validateAccessToken(accessToken);
-
         CustomerEntity customerEntityToBeUpdated = customerService.getCustomer(accessToken);
 
         CustomerEntity customerEntity = customerService.updateCustomerPassword(
