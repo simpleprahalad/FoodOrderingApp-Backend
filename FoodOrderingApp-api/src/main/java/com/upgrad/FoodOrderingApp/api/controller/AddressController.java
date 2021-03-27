@@ -1,10 +1,9 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
-import com.upgrad.FoodOrderingApp.service.businness.AddressBusinessService;
-import com.upgrad.FoodOrderingApp.service.businness.UtilityService;
+import com.upgrad.FoodOrderingApp.service.businness.AddressService;
+import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
@@ -39,12 +38,11 @@ public class AddressController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveAddressResponse> saveAddress(@RequestHeader("authorization") final String authorization,
-                                                           final SaveAddressRequest saveAddressRequest)
+                                                           @RequestBody(required = false) final SaveAddressRequest saveAddressRequest)
             throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
         //Access the accessToken from the request Header
         String accessToken = authorization.split("Bearer ")[1];
-        CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
-        CustomerEntity customer = customerAuthEntity.getCustomer();
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
 
         final AddressEntity addressEntity = new AddressEntity();
         addressEntity.setUuid(UUID.randomUUID().toString());
@@ -65,11 +63,9 @@ public class AddressController {
             method = RequestMethod.GET,
             value = "/address/customer",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public List<AddressList> saveAddress(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+    public ResponseEntity<AddressListResponse> getAddressOfCustomer(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
         String accessToken = authorization.split("Bearer ")[1];
-        CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
-        CustomerEntity customer = customerAuthEntity.getCustomer();
-
+        final CustomerEntity customer = customerService.getCustomer(accessToken);
         final List<AddressEntity> addresses = addressService.getAllAddress(customer);
         AddressListResponse addressListResponse = new AddressListResponse();
         for (AddressEntity a : addresses) {
@@ -98,8 +94,7 @@ public class AddressController {
                                                                @PathVariable("address_id") final String addressId)
             throws AuthorizationFailedException, AddressNotFoundException {
         final String accessToken = authorization.split("Bearer ")[1];
-        final CustomerAuthEntity customerAuthEntity = customerService.validateAccessToken(accessToken);
-        final CustomerEntity customer = customerAuthEntity.getCustomer();
+        CustomerEntity customer = customerService.getCustomer(accessToken);
 
         final AddressEntity addressToBeDeleted = addressService.getAddressByUUID(addressId, customer);
         final AddressEntity deletedAddress = addressService.deleteAddress(addressToBeDeleted);
@@ -122,7 +117,13 @@ public class AddressController {
                         .stateName(stateEntity.getStateName())))
                 .collect(Collectors.toList());
 
-        final StatesListResponse statesListResponse = new StatesListResponse().states(states);
+        //Strange to return null rather than empty list, just to satisfy a weird unit test case
+        final StatesListResponse statesListResponse;
+        if (states.isEmpty()) {
+            statesListResponse = new StatesListResponse().states(null);
+        } else {
+            statesListResponse = new StatesListResponse().states(states);
+        }
         return new ResponseEntity<>(statesListResponse, HttpStatus.OK);
     }
 }
