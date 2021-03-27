@@ -80,9 +80,27 @@ public class RestaurantController {
     public ResponseEntity<RestaurantDetailsResponse> getRestaurantByUuid(@PathVariable("restaurant_id") final String restaurantId)
             throws RestaurantNotFoundException {
         //Get all restaurants by category order by name as a list of RestaurantEntity
-        RestaurantEntity restaurant = restaurantService.restaurantByUUID(restaurantId);
+        RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantId);
+
         //Declare list of RestaurantListResponse
-        return getRestaurantDetailsResponseEntity(restaurant);
+        RestaurantDetailsResponse restaurantDetails = populateRestaurantDetailsObject(restaurantEntity);
+        List<CategoryList> categoriesList = new ArrayList<>();
+        List<CategoryEntity> categoriesByRestaurant = categoryService.getCategoriesByRestaurant(restaurantId);
+        for (CategoryEntity categoryEntity : categoriesByRestaurant) {
+            CategoryList categoryList = new CategoryList();
+            UUID uuid = UUID.fromString(categoryEntity.getUuid());
+            categoryList.setId(uuid);
+            categoryList.setCategoryName(categoryEntity.getCategoryName());
+            List<ItemEntity> itemEntities = itemService.getItemsByCategoryAndRestaurant(restaurantId, categoryEntity.getUuid());
+            final List<ItemList> itemLists = new ArrayList<>();
+            for (ItemEntity item : itemEntities) {
+                populateItemListObject(itemLists, item);
+            }
+            categoryList.setItemList(itemLists);
+            categoriesList.add(categoryList);
+        }
+        restaurantDetails.setCategories(categoriesList);
+        return new ResponseEntity<RestaurantDetailsResponse>(restaurantDetails, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.PUT,
@@ -120,28 +138,6 @@ public class RestaurantController {
         }
         restaurantListResponse.restaurants(restaurantLists);
         return new ResponseEntity<RestaurantListResponse>(restaurantListResponse, HttpStatus.OK);
-    }
-
-    private ResponseEntity<RestaurantDetailsResponse> getRestaurantDetailsResponseEntity(RestaurantEntity restaurantEntity) {
-        List<RestaurantDetailsResponse> restaurantDetailsResponse = new ArrayList<>();
-
-        RestaurantDetailsResponse restaurantDetails = populateRestaurantDetailsObject(restaurantEntity);
-        List<CategoryList> categoriesList = new ArrayList<>();
-        for (CategoryEntity categoryEntity : restaurantEntity.getCategories()) {
-            CategoryList categoryList = new CategoryList();
-            UUID uuid = UUID.fromString(categoryEntity.getUuid());
-            categoryList.setId(uuid);
-            categoryList.setCategoryName(categoryEntity.getCategoryName());
-            List<ItemEntity> itemEntities = itemService.getItemsByCategoryAndRestaurant(restaurantEntity.getUuid(), categoryEntity.getUuid());
-            final List<ItemList> itemLists = new ArrayList<>();
-            for (ItemEntity item : itemEntities) {
-                populateItemListObject(itemLists, item);
-            }
-            categoryList.setItemList(itemLists);
-            categoriesList.add(categoryList);
-        }
-        restaurantDetails.setCategories(categoriesList);
-        return new ResponseEntity<RestaurantDetailsResponse>(restaurantDetails, HttpStatus.OK);
     }
 
     static void populateItemListObject(List<ItemList> itemLists, ItemEntity item) {
