@@ -56,7 +56,7 @@ public class CustomerEntity implements Serializable {
     @NotNull
     private String salt;
 
-    @ManyToMany(mappedBy = "customers")
+    @OneToMany(mappedBy = "customer")
     private List<AddressEntity> addresses;
 
     public List<AddressEntity> getAddresses() {
