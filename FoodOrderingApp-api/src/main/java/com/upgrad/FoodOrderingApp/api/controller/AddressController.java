@@ -50,11 +50,9 @@ public class AddressController {
         addressEntity.setLocality(saveAddressRequest.getLocality());
         addressEntity.setCity(saveAddressRequest.getCity());
         addressEntity.setPincode(saveAddressRequest.getPincode());
-        //addressEntity.setState(addressService.getStateByUUID(saveAddressRequest.getStateUuid()));
-        String stateUUID = saveAddressRequest.getStateUuid();
+        addressEntity.setState(addressService.getStateByUUID(saveAddressRequest.getStateUuid()));
 
-
-        final AddressEntity savedAddress = addressService.saveAddress(customerEntity, addressEntity, stateUUID);
+        final AddressEntity savedAddress = addressService.saveAddress(customerEntity, addressEntity);
         final SaveAddressResponse saveAddressResponse = new SaveAddressResponse()
                 .id(savedAddress.getUuid())
                 .status("ADDRESS SUCCESSFULLY REGISTERED");
