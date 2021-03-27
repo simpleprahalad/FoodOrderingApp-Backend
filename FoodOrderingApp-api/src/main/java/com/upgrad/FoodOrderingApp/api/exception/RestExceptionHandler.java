@@ -88,4 +88,13 @@ public class RestExceptionHandler {
                 .message(exc.getErrorMessage()),
                 HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(PaymentMethodNotFoundException.class)
+    public ResponseEntity<ErrorResponse> PaymentMethodNotFoundException(PaymentMethodNotFoundException exc, WebRequest request) {
+        return new ResponseEntity<>(new ErrorResponse()
+                .code(exc.getCode())
+                .message(exc.getErrorMessage()),
+                HttpStatus.NOT_FOUND);
+    }
+
 }

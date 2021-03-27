@@ -36,7 +36,8 @@ public class OrderService {
     private OrderItemDao orderItemDao;
 
     @Transactional
-    public OrderEntity saveOrder(OrderEntity orderEntity) throws CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException, RestaurantNotFoundException {
+    public OrderEntity saveOrder(OrderEntity orderEntity)
+            throws CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException, RestaurantNotFoundException, AuthorizationFailedException {
         if (orderEntity.getCoupon() == null) {
             throw new CouponNotFoundException("CPF-002", "No coupon by this id");
         }
@@ -45,42 +46,18 @@ public class OrderService {
             throw new AddressNotFoundException("ANF-003", "No address by this id");
         }
 
-//        if (!orderEntity.getAddress().getCustomer().equals(customer)) {
-//            throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address");
-//        }
+        if (!orderEntity.getAddress().getCustomer().equals(orderEntity.getCustomer())) {
+            throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address");
+        }
+
         if (orderEntity.getPayment() == null) {
             throw new PaymentMethodNotFoundException("PNF-002", "No payment method found by this id");
         }
+
         if (orderEntity.getRestaurant() == null) {
             throw new RestaurantNotFoundException("RNF-001", "No restaurant by this id");
         }
         return orderDao.saveOrder(orderEntity);
-    }
-
-    public OrderEntity makeOrder(Double bill,
-                                 String couponUuid,
-                                 Double discount,
-                                 String paymentUuid,
-                                 CustomerEntity customer,
-                                 String addressUuid,
-                                 String restaurantUuid)
-            throws CouponNotFoundException, AddressNotFoundException, AuthorizationFailedException, PaymentMethodNotFoundException, RestaurantNotFoundException {
-        CouponEntity coupon = couponDao.getCouponByCouponUuid(couponUuid);
-        AddressEntity address = addressDao.getAddressByUuid(addressUuid);
-        PaymentEntity payment = paymentDao.getPaymentByUuid(paymentUuid);
-        RestaurantEntity restaurant = restaurantDao.getRestaurantByUuid(restaurantUuid);
-
-        OrderEntity order = new OrderEntity();
-        order.setBill(bill);
-        order.setCoupon(coupon);
-        order.setDiscount(discount);
-        order.setDate(new Date());
-        order.setPayment(payment);
-        order.setCustomer(customer);
-        order.setAddress(address);
-        order.setRestaurant(restaurant);
-        order.setUuid(UUID.randomUUID().toString());
-        return order;
     }
 
     public CouponEntity getCouponByCouponName(final String couponName) throws CouponNotFoundException {
@@ -100,8 +77,13 @@ public class OrderService {
         return orderDao.getAllOrdersOfCustomerByUuid(customerUuid);
     }
 
-    public CouponEntity getCouponByCouponId(final String couponId) {
-        return couponDao.getCouponByCouponUuid(couponId);
+    public CouponEntity getCouponByCouponId(final String couponId)
+            throws CouponNotFoundException {
+        CouponEntity coupon = couponDao.getCouponByCouponUuid(couponId);
+        if (coupon == null) {
+            throw new CouponNotFoundException("CPF-001", "No coupon by this name");
+        }
+        return coupon;
     }
 
     @Transactional

@@ -1,9 +1,7 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
-import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
-import com.upgrad.FoodOrderingApp.service.businness.ItemService;
-import com.upgrad.FoodOrderingApp.service.businness.OrderService;
+import com.upgrad.FoodOrderingApp.service.businness.*;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -31,6 +31,15 @@ public class OrderController {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private AddressService addressService;
+
+    @Autowired
+    private RestaurantService restaurantService;
 
     @RequestMapping(
             method = RequestMethod.GET,
@@ -74,8 +83,21 @@ public class OrderController {
         String couponUuid = saveOrderRequest.getCouponId().toString();
         String restaurantUuid = saveOrderRequest.getRestaurantId().toString();
 
-        OrderEntity order = orderService.makeOrder(bill,
-                couponUuid, discount, paymentUuid, customer, addressUuid, restaurantUuid);
+        CouponEntity coupon = orderService.getCouponByCouponId(couponUuid);
+        PaymentEntity payment = paymentService.getPaymentByUUID(paymentUuid);
+        AddressEntity address = addressService.getAddressByUUID(addressUuid, customer);
+        RestaurantEntity restaurant = restaurantService.restaurantByUUID(restaurantUuid);
+
+        OrderEntity order = new OrderEntity();
+        order.setBill(bill);
+        order.setCoupon(coupon);
+        order.setDiscount(discount);
+        order.setDate(new Date());
+        order.setPayment(payment);
+        order.setCustomer(customer);
+        order.setAddress(address);
+        order.setRestaurant(restaurant);
+        order.setUuid(UUID.randomUUID().toString());
         orderService.saveOrder(order);
 
         //Populating order
@@ -116,14 +138,14 @@ public class OrderController {
 
         //Return the response payload
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
-        customerOrderResponse.setOrders(orderList);
+        customerOrderResponse.orders(orderList);
         return new ResponseEntity<>(customerOrderResponse, HttpStatus.OK);
     }
 
     private OrderList prepareOrderListObject(final OrderEntity orderEntity) {
         final OrderList orderList = new OrderList();
-        orderList.bill(orderEntity.getBill());
-        orderList.discount(orderEntity.getDiscount());
+        orderList.bill( BigDecimal.valueOf(orderEntity.getBill()));
+        orderList.discount( BigDecimal.valueOf(orderEntity.getDiscount()));
         orderList.date(orderEntity.getDate().toString());
 
         orderList.coupon(prepareOrderListCoupon(orderEntity));
