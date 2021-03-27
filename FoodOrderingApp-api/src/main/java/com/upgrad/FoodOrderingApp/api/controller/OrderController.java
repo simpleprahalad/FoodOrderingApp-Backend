@@ -11,10 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -98,7 +95,7 @@ public class OrderController {
         order.setAddress(address);
         order.setRestaurant(restaurant);
         order.setUuid(UUID.randomUUID().toString());
-        orderService.saveOrder(order);
+        OrderEntity savedOrder = orderService.saveOrder(order);
 
         //Populating order
         for (ItemQuantity itemQuantity : saveOrderRequest.getItemQuantities()) {
@@ -113,7 +110,7 @@ public class OrderController {
 
         //Return the response payload
         final SaveOrderResponse saveOrderResponse = new SaveOrderResponse();
-        saveOrderResponse.setId(order.getUuid());
+        saveOrderResponse.setId(savedOrder.getUuid());
         saveOrderResponse.status("ORDER SUCCESSFULLY PLACED");
         return new ResponseEntity<>(saveOrderResponse, HttpStatus.CREATED);
     }
@@ -136,6 +133,7 @@ public class OrderController {
                 .flatMap((Function<OrderEntity, Stream<OrderList>>) ordersEntity -> Stream.of(prepareOrderListObject(ordersEntity)))
                 .collect(Collectors.toList());
 
+
         //Return the response payload
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
         customerOrderResponse.orders(orderList);
@@ -144,6 +142,7 @@ public class OrderController {
 
     private OrderList prepareOrderListObject(final OrderEntity orderEntity) {
         final OrderList orderList = new OrderList();
+        orderList.id(UUID.fromString(orderEntity.getUuid()));
         orderList.bill( BigDecimal.valueOf(orderEntity.getBill()));
         orderList.discount( BigDecimal.valueOf(orderEntity.getDiscount()));
         orderList.date(orderEntity.getDate().toString());
