@@ -34,9 +34,7 @@ public class StateEntity implements Serializable {
     @NotNull
     private String stateName;
 
-
-    public StateEntity() {
-    }
+    public StateEntity() { }
 
     public StateEntity(String stateUuid, String state) {
         uuid = stateUuid;

@@ -9,21 +9,18 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 @Entity
 @Table(name = "orders")
 @NamedQueries(
         {
-                @NamedQuery(name = "getAllOrdersOfCustomerByUuid", query = "select o from OrdersEntity o where o.customer.uuid=:customerUuid"),
-                @NamedQuery(name = "getAllOrdersByRestaurantUUid", query = "select o from OrdersEntity o where o.restaurant.uuid=:restaurantUuid"),
+                @NamedQuery(name = "getAllOrdersOfCustomerByUuid", query = "select o from OrderEntity o where o.customer.uuid=:customerUuid"),
+                @NamedQuery(name = "getAllOrdersByRestaurantUUid", query = "select o from OrderEntity o where o.restaurant.uuid=:restaurantUuid"),
 
         }
 )
-public class OrdersEntity implements Serializable {
+public class OrderEntity implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,14 +33,14 @@ public class OrdersEntity implements Serializable {
 
     @Column(name = "bill")
     @NotNull
-    private BigDecimal bill;
+    private Double bill;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coupon_id", nullable = true)
     private CouponEntity coupon;
 
     @Column(name = "discount")
-    private BigDecimal discount;
+    private Double discount;
 
     @Column(name = "date")
     @NotNull
@@ -64,6 +61,22 @@ public class OrdersEntity implements Serializable {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
+
+    public OrderEntity() {
+    }
+
+    public OrderEntity(String orderId, Double bill, CouponEntity couponEntity, Double discount,
+                       Date date, PaymentEntity paymentEntity, CustomerEntity customerEntity, AddressEntity addressEntity, RestaurantEntity restaurantEntity) {
+        this.uuid = orderId;
+        this.bill = bill;
+        this.coupon = couponEntity;
+        this.discount = discount;
+        this.date = date;
+        this.payment = paymentEntity;
+        this.customer = customerEntity;
+        this.address = addressEntity;
+        this.restaurant = restaurantEntity;
+    }
 
     public Integer getId() {
         return id;
@@ -129,19 +142,19 @@ public class OrdersEntity implements Serializable {
         this.restaurant = restaurant;
     }
 
-    public BigDecimal getBill() {
+    public Double getBill() {
         return bill;
     }
 
-    public void setBill(BigDecimal bill) {
+    public void setBill(Double bill) {
         this.bill = bill;
     }
 
-    public BigDecimal getDiscount() {
+    public Double getDiscount() {
         return discount;
     }
 
-    public void setDiscount(BigDecimal discount) {
+    public void setDiscount(Double discount) {
         this.discount = discount;
     }
 

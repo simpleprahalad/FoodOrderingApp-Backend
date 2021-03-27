@@ -56,10 +56,10 @@ public class ItemService {
     public List<ItemEntity> getItemsByPopularity(RestaurantEntity restaurantEntity) {
 
         //Get all orders of the given restaurant
-        List<OrdersEntity> ordersEntities = orderDao.getAllOrdersRestaurantUuid(restaurantEntity.getUuid());
+        List<OrderEntity> ordersEntities = orderDao.getAllOrdersRestaurantUuid(restaurantEntity.getUuid());
 
         Map<String,Integer> itemCountHashMap = new HashMap<>();
-        for (OrdersEntity orderedEntity : ordersEntities) {
+        for (OrderEntity orderedEntity : ordersEntities) {
             //Get order item entity from order's uuid
             List<OrderItemEntity> orderItemEntities = orderItemDao.getOrderItemsByOrderUuid(orderedEntity.getUuid());
             System.out.print("\norder entity"+orderedEntity.getId());

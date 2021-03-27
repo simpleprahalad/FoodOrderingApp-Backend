@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -37,45 +36,28 @@ public class OrderService {
     private OrderItemDao orderItemDao;
 
     @Transactional
-    public OrdersEntity saveOrder(BigDecimal bill, String couponUuid, BigDecimal discount, String paymentUuid, CustomerEntity customer, String addressUuid, String restaurantUuid) throws CouponNotFoundException, AddressNotFoundException, AuthorizationFailedException, PaymentMethodNotFoundException, RestaurantNotFoundException {
-        CouponEntity coupon = couponDao.getCouponByCouponUuid(couponUuid);
-        AddressEntity address = addressDao.getAddressByUuid(addressUuid);
-        PaymentEntity payment = paymentDao.getPaymentByUuid(paymentUuid);
-        RestaurantEntity restaurant = restaurantDao.getRestaurantByUuid(restaurantUuid);
-
-        if(coupon == null) {
+    public OrderEntity saveOrder(OrderEntity orderEntity)
+            throws CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException, RestaurantNotFoundException, AuthorizationFailedException {
+        if (orderEntity.getCoupon() == null) {
             throw new CouponNotFoundException("CPF-002", "No coupon by this id");
         }
-        if (address == null) {
+
+        if (orderEntity.getAddress() == null) {
             throw new AddressNotFoundException("ANF-003", "No address by this id");
         }
-        /** TBD **/
-        //Change this from Many to One address
-//        if(!address.getCustomers().get(0).equals(customer)){
-//            throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address");
-//        }
-        if (payment == null) {
+
+        if (!orderEntity.getAddress().getCustomer().equals(orderEntity.getCustomer())) {
+            throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address");
+        }
+
+        if (orderEntity.getPayment() == null) {
             throw new PaymentMethodNotFoundException("PNF-002", "No payment method found by this id");
         }
-        if(restaurant == null) {
+
+        if (orderEntity.getRestaurant() == null) {
             throw new RestaurantNotFoundException("RNF-001", "No restaurant by this id");
         }
-
-        OrdersEntity order = new OrdersEntity();
-
-        order.setBill(bill);
-        order.setCoupon(coupon);
-        order.setDiscount(discount);
-        order.setDate(new Date());
-        order.setPayment(payment);
-        order.setCustomer(customer);
-        order.setAddress(address);
-        order.setRestaurant(restaurant);
-
-        order.setUuid(UUID.randomUUID().toString());
-        orderDao.saveOrder(order);
-
-        return order;
+        return orderDao.saveOrder(orderEntity);
     }
 
     public CouponEntity getCouponByCouponName(final String couponName) throws CouponNotFoundException {
@@ -84,19 +66,29 @@ public class OrderService {
         }
 
         CouponEntity coupon = couponDao.getCouponByCouponName(couponName);
-        if(coupon == null){
+        if (coupon == null) {
             throw new CouponNotFoundException("CPF-001", "No coupon by this name");
         }
 
         return coupon;
     }
 
-    public List<OrdersEntity> getAllOrdersOfCustomer(final CustomerEntity customerEntity) {
-        return orderDao.getAllOrdersOfCustomerByUuid(customerEntity.getUuid());
+    public List<OrderEntity> getOrdersByCustomers(final String customerUuid) {
+        return orderDao.getAllOrdersOfCustomerByUuid(customerUuid);
+    }
+
+    public CouponEntity getCouponByCouponId(final String couponId)
+            throws CouponNotFoundException {
+        CouponEntity coupon = couponDao.getCouponByCouponUuid(couponId);
+        if (coupon == null) {
+            throw new CouponNotFoundException("CPF-001", "No coupon by this name");
+        }
+        return coupon;
     }
 
     @Transactional
-    public void saveOrderItem(OrderItemEntity orderItemEntity) {
+    public OrderItemEntity saveOrderItem(OrderItemEntity orderItemEntity) {
         orderItemDao.saveOrderItem(orderItemEntity);
+        return orderItemEntity;
     }
 }
