@@ -19,7 +19,7 @@ import java.util.List;
 @NamedQueries(
         {
                 @NamedQuery(name = "getAddressesByCustomerUuid", query = "SELECT distinct a FROM AddressEntity a " +
-                        "join a.customers c where c.uuid=:customerUuid"),
+                        "join a.customer c where c.uuid=:customerUuid"),
 
                 @NamedQuery(name = "getAddressByUuid", query = "select  a FROM AddressEntity a where a.uuid=:uuid")
         }
@@ -63,6 +63,14 @@ public class AddressEntity implements Serializable {
     @JoinColumn(name = "state_id", nullable = false)
     private StateEntity state;
 
+    @ManyToOne
+    @JoinTable(
+            name = "customer_address",
+            joinColumns = @JoinColumn(name = "address_id"),
+            inverseJoinColumns = @JoinColumn(name = "customer_id")
+    )
+    private CustomerEntity customer;
+
     public AddressEntity() {
 
     }
@@ -75,6 +83,14 @@ public class AddressEntity implements Serializable {
         city = someCity;
         pincode = s1;
         this.state = stateEntity;
+    }
+
+    public CustomerEntity getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(CustomerEntity customer) {
+        this.customer = customer;
     }
 
     public int getId() {
@@ -132,29 +148,6 @@ public class AddressEntity implements Serializable {
     public void setState(StateEntity state) {
         this.state = state;
     }
-
-    public List<CustomerEntity> getCustomers() {
-        return customers;
-    }
-
-    public void setCustomers(List<CustomerEntity> customers) {
-        this.customers = customers;
-    }
-
-    public void addCustomer(CustomerEntity customer) {
-        if (this.customers == null) {
-            this.customers = new LinkedList<CustomerEntity>();
-        }
-        this.customers.add(customer);
-    }
-
-    @ManyToMany
-    @JoinTable(
-            name = "customer_address",
-            joinColumns = @JoinColumn(name = "address_id"),
-            inverseJoinColumns = @JoinColumn(name = "customer_id")
-    )
-    private List<CustomerEntity> customers;
 
     public String getFlatBuilNo() {
         return flatBuilNo;

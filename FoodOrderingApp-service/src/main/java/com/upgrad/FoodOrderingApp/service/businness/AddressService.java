@@ -26,22 +26,32 @@ public class AddressService {
     @Autowired
     private AddressDao addressDao;
 
-    public StateEntity getStateByUUID(final String stateUuid) throws AddressNotFoundException {
+    @Autowired
+    private AddressService addressService;
+
+    public StateEntity getStateByUUID(final String stateUuid) throws AddressNotFoundException, SaveAddressException {
+        if (stateUuid == null || stateUuid.isEmpty()) {
+            throw new SaveAddressException("SAR-001", "No field can be empty");
+        }
         final StateEntity stateEntity = stateDao.getStateByUuid(stateUuid);
         if (null == stateEntity) {
-            throw new AddressNotFoundException("ANF-002", "No state by this id.");
+            throw new AddressNotFoundException("ANF-002", "No state by this id");
         }
         return stateEntity;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public AddressEntity saveAddress(final CustomerEntity customerEntity, final AddressEntity addressEntity) throws SaveAddressException {
-        if (addressEntity.getFlatBuilNo() == null || addressEntity.getLocality() == null || addressEntity.getCity() == null) {
-            throw new SaveAddressException("SAR-001", "No field can be empty.");
+    public AddressEntity saveAddress(final CustomerEntity customerEntity, final AddressEntity addressEntity)
+            throws SaveAddressException {
+        if (addressEntity.getFlatBuilNo() == null || addressEntity.getLocality() == null ||
+                addressEntity.getCity() == null || addressEntity.getPincode() == null) {
+            throw new SaveAddressException("SAR-001", "No field can be empty");
         } else if (!isValidPincode(addressEntity.getPincode())) {
-            throw new SaveAddressException("SAR-002", "Invalid pincode.");
+            throw new SaveAddressException("SAR-002", "Invalid pincode");
         }
-        addressEntity.addCustomer(customerEntity);
+        
+        addressEntity.setCustomer(customerEntity);
+
         return addressDao.saveAddress(addressEntity);
     }
 
