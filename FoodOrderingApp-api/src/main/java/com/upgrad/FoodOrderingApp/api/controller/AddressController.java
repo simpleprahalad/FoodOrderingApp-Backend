@@ -92,8 +92,7 @@ public class AddressController {
                                                                @PathVariable("address_id") final String addressId)
             throws AuthorizationFailedException, AddressNotFoundException {
         final String accessToken = authorization.split("Bearer ")[1];
-
-        customerService.validateAccessToken(accessToken);
+        
         CustomerEntity customer = customerService.getCustomer(accessToken);
 
         final AddressEntity addressToBeDeleted = addressService.getAddressByUUID(addressId, customer);

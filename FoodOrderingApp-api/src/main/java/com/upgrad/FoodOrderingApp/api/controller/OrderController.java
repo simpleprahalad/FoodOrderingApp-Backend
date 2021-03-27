@@ -43,7 +43,7 @@ public class OrderController {
 
         //Validate customer state
         String accessToken = authorization.split("Bearer ")[1];
-        customerService.validateAccessToken(accessToken);
+        customerService.getCustomer(accessToken);
 
         final CouponEntity coupon = orderService.getCouponByCouponName(couponName);
         CouponDetailsResponse couponDetailsResponse = new CouponDetailsResponse();
@@ -66,7 +66,6 @@ public class OrderController {
 
         //Validate customer state
         String accessToken = authorization.split("Bearer ")[1];
-        customerService.validateAccessToken(accessToken);
         final CustomerEntity customer = customerService.getCustomer(accessToken);
 
         String addressUuid = saveOrderRequest.getAddressId();
@@ -106,7 +105,6 @@ public class OrderController {
         String accessToken = authorization.split("Bearer ")[1];
 
         //Validate customer state and get it.
-        customerService.validateAccessToken(accessToken);
         final CustomerEntity customer = customerService.getCustomer(accessToken);
 
         final List<OrderList> orderList = orderService.getOrdersByCustomers(customer)
