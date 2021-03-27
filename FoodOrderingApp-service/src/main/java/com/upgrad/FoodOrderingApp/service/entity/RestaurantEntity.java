@@ -42,15 +42,15 @@ public class RestaurantEntity implements Serializable {
 
     @Column(name = "customer_rating")
     @NotNull
-    private double customerRating;
+    private BigDecimal customerRating;
 
     @Column(name = "average_price_for_two")
     @NotNull
-    private int averagePriceForTwo;
+    private Integer averagePriceForTwo;
 
     @Column(name = "number_of_customers_rated")
     @NotNull
-    private int numberOfCustomersRated;
+    private Integer numberOfCustomersRated;
 
     @OneToOne
     @JoinColumn(name = "address_id", referencedColumnName = "id")
@@ -67,14 +67,6 @@ public class RestaurantEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     @OrderBy("categoryName asc")
     private List<CategoryEntity> categories = new ArrayList<>();
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getUuid() {
         return uuid;
@@ -98,30 +90,6 @@ public class RestaurantEntity implements Serializable {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
-    }
-
-    public double getCustomerRating() {
-        return customerRating;
-    }
-
-    public void setCustomerRating(double customerRating) {
-        this.customerRating = customerRating;
-    }
-
-    public int getAvgPrice() {
-        return averagePriceForTwo;
-    }
-
-    public void setAvgPrice(int averagePriceForTwo) {
-        this.averagePriceForTwo = averagePriceForTwo;
-    }
-
-    public int getNumberCustomersRated() {
-        return numberOfCustomersRated;
-    }
-
-    public void setNumberCustomersRated(int numberOfCustomersRated) {
-        this.numberOfCustomersRated = numberOfCustomersRated;
     }
 
     public AddressEntity getAddress() {
@@ -161,5 +129,37 @@ public class RestaurantEntity implements Serializable {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getNumberOfCustomersRated() {
+        return numberOfCustomersRated;
+    }
+
+    public void setNumberOfCustomersRated(Integer numberOfCustomersRated) {
+        this.numberOfCustomersRated = numberOfCustomersRated;
+    }
+
+    public Integer getAveragePriceForTwo() {
+        return averagePriceForTwo;
+    }
+
+    public void setAveragePriceForTwo(Integer averagePriceForTwo) {
+        this.averagePriceForTwo = averagePriceForTwo;
+    }
+
+    public BigDecimal getCustomerRating() {
+        return customerRating;
+    }
+
+    public void setCustomerRating(BigDecimal customerRating) {
+        this.customerRating = customerRating;
     }
 }
