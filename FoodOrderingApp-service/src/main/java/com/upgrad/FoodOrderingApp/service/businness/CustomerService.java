@@ -61,8 +61,9 @@ public class CustomerService {
         return (m.find() && m.group().equals(contactNumber));
     }
 
-    @javax.transaction.Transactional
-    public CustomerAuthEntity validateAccessToken(final String accessToken) throws AuthorizationFailedException {
+    @Transactional
+    public void validateAccessToken(final String accessToken) throws AuthorizationFailedException {
+
         CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
 
         //Checking if Customer not logged In
@@ -83,7 +84,6 @@ public class CustomerService {
             throw new AuthorizationFailedException("ATHR-003",
                     "Your session is expired. Log in again to access this endpoint.");
         }
-        return customerAuthEntity;
     }
 
     public CustomerEntity getCustomer(final String accessToken) throws AuthorizationFailedException {
@@ -158,6 +158,7 @@ public class CustomerService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerAuthEntity logout(final String accessToken) throws AuthorizationFailedException {
+
         CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
 
         //Paremters are checked as below if the conditions are not satisfied it throws exception.
