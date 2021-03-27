@@ -49,6 +49,7 @@ public class OrderService {
         if (address == null) {
             throw new AddressNotFoundException("ANF-003", "No address by this id");
         }
+        /** TBD **/
         //Change this from Many to One address
 //        if(!address.getCustomers().get(0).equals(customer)){
 //            throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address");

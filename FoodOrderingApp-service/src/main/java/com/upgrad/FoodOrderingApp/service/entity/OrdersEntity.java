@@ -19,6 +19,7 @@ import java.util.List;
 @NamedQueries(
         {
                 @NamedQuery(name = "getAllOrdersOfCustomerByUuid", query = "select o from OrdersEntity o where o.customer.uuid=:customerUuid"),
+                @NamedQuery(name = "getAllOrdersByRestaurantUUid", query = "select o from OrdersEntity o where o.restaurant.uuid=:restaurantUuid"),
 
         }
 )
@@ -64,16 +65,6 @@ public class OrdersEntity implements Serializable {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
 
-    @OneToMany(mappedBy = "item")
-    private List<OrderItemEntity> items;
-
-    public void addOrderItem(OrderItemEntity orderItemEntity) {
-        if(this.items == null){
-            this.items = new LinkedList<OrderItemEntity>();
-        }
-        this.items.add(orderItemEntity);
-    }
-
     public Integer getId() {
         return id;
     }
@@ -88,14 +79,6 @@ public class OrdersEntity implements Serializable {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public List<OrderItemEntity> getItems() {
-        return items;
-    }
-
-    public void setItems(List<OrderItemEntity> items) {
-        this.items = items;
     }
 
     public Date getDate() {

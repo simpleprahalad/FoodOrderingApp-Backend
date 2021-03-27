@@ -4,6 +4,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -11,6 +13,12 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "order_item")
+@NamedQueries(
+        {
+                @NamedQuery(name = "getItemsByOrderUuid", query = "select oi from OrderItemEntity oi where oi.order.uuid = :orderUuid"),
+
+        }
+)
 public class OrderItemEntity implements Serializable {
 
     @Id
@@ -18,12 +26,15 @@ public class OrderItemEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @NotNull
     private OrdersEntity order;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "item_id")
+    @NotNull
     private ItemEntity item;
 
     @Column(name = "quantity")

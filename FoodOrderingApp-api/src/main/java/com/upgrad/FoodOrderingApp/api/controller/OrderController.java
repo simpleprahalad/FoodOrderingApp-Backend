@@ -86,6 +86,7 @@ public class OrderController {
             orderItemEntity.setItem(item);
             orderItemEntity.setQuantity(itemQuantity.getQuantity());
             orderItemEntity.setPrice(itemQuantity.getPrice());
+            orderService.saveOrderItem(orderItemEntity);
         }
 
         //Return the response payload
@@ -169,4 +170,5 @@ public class OrderController {
         orderListCoupon.setPercent(couponEntity.getPercent());
         return orderListCoupon;
     }
+
 }
