@@ -62,7 +62,7 @@ public class RestaurantEntity implements Serializable {
     @OrderBy("lower(itemName) asc")
     private List<ItemEntity> items = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "restaurant_category", joinColumns = @JoinColumn(name = "restaurant_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     @OrderBy("categoryName asc")
