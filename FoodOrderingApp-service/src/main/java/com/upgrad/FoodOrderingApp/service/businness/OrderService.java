@@ -37,7 +37,7 @@ public class OrderService {
     private OrderItemDao orderItemDao;
 
     @Transactional
-    public OrdersEntity saveOrder(BigDecimal bill, String couponUuid, BigDecimal discount, String paymentUuid, CustomerEntity customer, String addressUuid, String restaurantUuid) throws CouponNotFoundException, AddressNotFoundException, AuthorizationFailedException, PaymentMethodNotFoundException, RestaurantNotFoundException {
+    public OrderEntity saveOrder(BigDecimal bill, String couponUuid, BigDecimal discount, String paymentUuid, CustomerEntity customer, String addressUuid, String restaurantUuid) throws CouponNotFoundException, AddressNotFoundException, AuthorizationFailedException, PaymentMethodNotFoundException, RestaurantNotFoundException {
         CouponEntity coupon = couponDao.getCouponByCouponUuid(couponUuid);
         AddressEntity address = addressDao.getAddressByUuid(addressUuid);
         PaymentEntity payment = paymentDao.getPaymentByUuid(paymentUuid);
@@ -61,7 +61,7 @@ public class OrderService {
             throw new RestaurantNotFoundException("RNF-001", "No restaurant by this id");
         }
 
-        OrdersEntity order = new OrdersEntity();
+        OrderEntity order = new OrderEntity();
 
         order.setBill(bill);
         order.setCoupon(coupon);
@@ -91,7 +91,7 @@ public class OrderService {
         return coupon;
     }
 
-    public List<OrdersEntity> getAllOrdersOfCustomer(final CustomerEntity customerEntity) {
+    public List<OrderEntity> getAllOrdersOfCustomer(final CustomerEntity customerEntity) {
         return orderDao.getAllOrdersOfCustomerByUuid(customerEntity.getUuid());
     }
 

@@ -18,12 +18,12 @@ import java.util.List;
 @Table(name = "orders")
 @NamedQueries(
         {
-                @NamedQuery(name = "getAllOrdersOfCustomerByUuid", query = "select o from OrdersEntity o where o.customer.uuid=:customerUuid"),
-                @NamedQuery(name = "getAllOrdersByRestaurantUUid", query = "select o from OrdersEntity o where o.restaurant.uuid=:restaurantUuid"),
+                @NamedQuery(name = "getAllOrdersOfCustomerByUuid", query = "select o from OrderEntity o where o.customer.uuid=:customerUuid"),
+                @NamedQuery(name = "getAllOrdersByRestaurantUUid", query = "select o from OrderEntity o where o.restaurant.uuid=:restaurantUuid"),
 
         }
 )
-public class OrdersEntity implements Serializable {
+public class OrderEntity implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

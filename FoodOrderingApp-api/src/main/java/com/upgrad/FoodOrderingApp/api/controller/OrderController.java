@@ -76,7 +76,7 @@ public class OrderController {
         String couponUuid = saveOrderRequest.getCouponId().toString();
         String restaurantUuid = saveOrderRequest.getRestaurantId().toString();
 
-        OrdersEntity order = orderService.saveOrder(bill, couponUuid, discount, paymentUuid, customer, addressUuid, restaurantUuid);
+        OrderEntity order = orderService.saveOrder(bill, couponUuid, discount, paymentUuid, customer, addressUuid, restaurantUuid);
 
         //Populating order
         for (ItemQuantity itemQuantity : saveOrderRequest.getItemQuantities()) {
@@ -111,8 +111,8 @@ public class OrderController {
 
         final List<OrderList> orderList = orderService.getAllOrdersOfCustomer(customer)
                 .stream()
-                .sorted(Comparator.comparing(OrdersEntity::getDate)) //Reorder based on date of order creation
-                .flatMap((Function<OrdersEntity, Stream<OrderList>>) ordersEntity -> Stream.of(prepareOrderListObject(ordersEntity)))
+                .sorted(Comparator.comparing(OrderEntity::getDate)) //Reorder based on date of order creation
+                .flatMap((Function<OrderEntity, Stream<OrderList>>) ordersEntity -> Stream.of(prepareOrderListObject(ordersEntity)))
                 .collect(Collectors.toList());
 
         //Return the response payload
@@ -121,15 +121,15 @@ public class OrderController {
         return new ResponseEntity<>(customerOrderResponse, HttpStatus.OK);
     }
 
-    private OrderList prepareOrderListObject(final OrdersEntity ordersEntity) {
+    private OrderList prepareOrderListObject(final OrderEntity orderEntity) {
         final OrderList orderList = new OrderList();
-        orderList.bill(ordersEntity.getBill());
-        orderList.discount(ordersEntity.getDiscount());
-        orderList.date(ordersEntity.getDate().toString());
+        orderList.bill(orderEntity.getBill());
+        orderList.discount(orderEntity.getDiscount());
+        orderList.date(orderEntity.getDate().toString());
 
-        orderList.coupon(prepareOrderListCoupon(ordersEntity));
-        orderList.customer(prepareOrderListCustomer(ordersEntity.getCustomer()));
-        orderList.address(prepareOrderListAddress(ordersEntity.getAddress()));
+        orderList.coupon(prepareOrderListCoupon(orderEntity));
+        orderList.customer(prepareOrderListCustomer(orderEntity.getCustomer()));
+        orderList.address(prepareOrderListAddress(orderEntity.getAddress()));
 
         return orderList;
     }
@@ -162,8 +162,8 @@ public class OrderController {
         return orderListCustomer;
     }
 
-    private OrderListCoupon prepareOrderListCoupon(final OrdersEntity ordersEntity) {
-        final CouponEntity couponEntity = ordersEntity.getCoupon();
+    private OrderListCoupon prepareOrderListCoupon(final OrderEntity orderEntity) {
+        final CouponEntity couponEntity = orderEntity.getCoupon();
         OrderListCoupon orderListCoupon = new OrderListCoupon();
         orderListCoupon.setCouponName(couponEntity.getCouponName());
         orderListCoupon.setId(UUID.fromString(couponEntity.getUuid()));

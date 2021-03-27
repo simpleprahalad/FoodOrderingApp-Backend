@@ -1,6 +1,6 @@
 package com.upgrad.FoodOrderingApp.service.dao;
 
-import com.upgrad.FoodOrderingApp.service.entity.OrdersEntity;
+import com.upgrad.FoodOrderingApp.service.entity.OrderEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -14,23 +14,23 @@ public class OrderDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<OrdersEntity> getAllOrdersOfCustomerByUuid(final String customerUuid) {
+    public List<OrderEntity> getAllOrdersOfCustomerByUuid(final String customerUuid) {
         try {
-            return entityManager.createNamedQuery("getAllOrdersOfCustomerByUuid", OrdersEntity.class).setParameter("customerUuid", customerUuid).getResultList();
+            return entityManager.createNamedQuery("getAllOrdersOfCustomerByUuid", OrderEntity.class).setParameter("customerUuid", customerUuid).getResultList();
         } catch (NoResultException nre) {
             return null;
         }
     }
 
-    public List<OrdersEntity> getAllOrdersRestaurantUuid(final String restaurantUuid) {
+    public List<OrderEntity> getAllOrdersRestaurantUuid(final String restaurantUuid) {
         try {
-            return entityManager.createNamedQuery("getAllOrdersByRestaurantUUid", OrdersEntity.class).setParameter("restaurantUuid", restaurantUuid).getResultList();
+            return entityManager.createNamedQuery("getAllOrdersByRestaurantUUid", OrderEntity.class).setParameter("restaurantUuid", restaurantUuid).getResultList();
         } catch (NoResultException nre) {
             return null;
         }
     }
 
-    public String saveOrder(OrdersEntity order) {
+    public String saveOrder(OrderEntity order) {
         entityManager.persist(order);
         return order.getUuid();
     }
