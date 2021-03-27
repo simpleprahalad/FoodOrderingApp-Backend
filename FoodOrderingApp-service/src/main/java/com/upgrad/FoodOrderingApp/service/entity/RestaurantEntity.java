@@ -42,7 +42,7 @@ public class RestaurantEntity implements Serializable {
 
     @Column(name = "customer_rating")
     @NotNull
-    private BigDecimal customerRating;
+    private double customerRating;
 
     @Column(name = "average_price_for_two")
     @NotNull
@@ -126,11 +126,6 @@ public class RestaurantEntity implements Serializable {
         return new HashCodeBuilder().append(this).hashCode();
     }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-    }
-
     public Integer getId() {
         return id;
     }
@@ -139,27 +134,43 @@ public class RestaurantEntity implements Serializable {
         this.id = id;
     }
 
-    public Integer getNumberOfCustomersRated() {
+    public Integer getNumberCustomersRated() {
         return numberOfCustomersRated;
     }
 
-    public void setNumberOfCustomersRated(Integer numberOfCustomersRated) {
+    public void setNumberCustomersRated(Integer numberOfCustomersRated) {
         this.numberOfCustomersRated = numberOfCustomersRated;
     }
 
-    public Integer getAveragePriceForTwo() {
+    public Integer getAvgPrice() {
         return averagePriceForTwo;
     }
 
-    public void setAveragePriceForTwo(Integer averagePriceForTwo) {
+    public void setAvgPrice(Integer averagePriceForTwo) {
         this.averagePriceForTwo = averagePriceForTwo;
     }
 
-    public BigDecimal getCustomerRating() {
+    public double getCustomerRating() {
         return customerRating;
     }
 
-    public void setCustomerRating(BigDecimal customerRating) {
+    public void setCustomerRating(double customerRating) {
         this.customerRating = customerRating;
+    }
+
+    @Override
+    public String toString() {
+        return "RestaurantEntity{" +
+                "id=" + id +
+                ", uuid='" + uuid + '\'' +
+                ", restaurantName='" + restaurantName + '\'' +
+                ", photoUrl='" + photoUrl + '\'' +
+                ", customerRating=" + customerRating +
+                ", averagePriceForTwo=" + averagePriceForTwo +
+                ", numberOfCustomersRated=" + numberOfCustomersRated +
+                ", address=" + address +
+                ", items=" + items +
+                ", categories=" + categories +
+                '}';
     }
 }

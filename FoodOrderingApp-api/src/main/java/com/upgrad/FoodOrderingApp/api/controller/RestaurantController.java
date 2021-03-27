@@ -40,7 +40,7 @@ public class RestaurantController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<RestaurantList>> getAllRestaurants() {
+    public ResponseEntity<RestaurantListResponse> getAllRestaurants() {
 
         //Get all restaurants order by rating as a list of RestaurantEntity
         List<RestaurantEntity> restaurants = restaurantService.restaurantsByRating();
@@ -52,7 +52,7 @@ public class RestaurantController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant/name/{restaurant_name}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<RestaurantList>> getRestaurantsByName(@PathVariable("restaurant_name") final String restaurantName)
+    public ResponseEntity<RestaurantListResponse> getRestaurantsByName(@PathVariable("restaurant_name") final String restaurantName)
             throws RestaurantNotFoundException {
         //Get all restaurants by name order by name as a list of RestaurantEntity
         List<RestaurantEntity> restaurants = restaurantService.restaurantsByName(restaurantName);
@@ -65,7 +65,7 @@ public class RestaurantController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant/category/{category_id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<RestaurantList>> restaurantByCategory(@PathVariable("category_id") final String categoryId)
+    public ResponseEntity<RestaurantListResponse> restaurantByCategory(@PathVariable("category_id") final String categoryId)
             throws CategoryNotFoundException {
         //Get all restaurants by category order by name as a list of RestaurantEntity
         List<RestaurantEntity> restaurants = restaurantService.restaurantByCategory(categoryId);
@@ -86,7 +86,7 @@ public class RestaurantController {
     }
 
     @RequestMapping(method = RequestMethod.PUT,
-            path = "/restaurant//{restaurant_id}",
+            path = "/restaurant/{restaurant_id}",
             params = "customer_rating",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantDetails(@RequestHeader("authorization") final String authorization,
@@ -109,46 +109,17 @@ public class RestaurantController {
     }
 
     private ResponseEntity<RestaurantListResponse> getRestaurantListResponseEntity(List<RestaurantEntity> restaurants) {
-//        List<RestaurantList> restaurantListResponse = new ArrayList<>();
-//        for (RestaurantEntity restaurantEntity : restaurants) {
-//            RestaurantList restaurant = populateRestaurantListObject(restaurantEntity);
-//            //Get Category names of that restaurant
-//            List<CategoryEntity> categoriesList = categoryService.getCategoriesByRestaurant(restaurantEntity.getUuid());
-//            restaurant.setCategories(getCommaSeparatedCategoryName(categoriesList));
-//            restaurantListResponse.add(restaurant);
-//        }
-        restaurants
-                .stream()
-                .flatMap(new Function<RestaurantEntity, Stream<?>>() {
-                    @Override
-                    public Stream<?> apply(RestaurantEntity restaurantEntity) {
-                        RestaurantList restaurantList = new RestaurantList();
-                        restaurantList.restaurantName(restaurantEntity.getRestaurantName());
-                        restaurantList.averagePrice(restaurantEntity.getAveragePriceForTwo());
-                        restaurantList.categories(restaurantEntity.getCategories());
-                        restaurantList.customerRating(restaurantEntity.getCustomerRating());
-
-                        final AddressEntity address = restaurantEntity.getAddress();
-                        RestaurantDetailsResponseAddress restaurantDetailsResponseAddress = new RestaurantDetailsResponseAddress();
-                        restaurantDetailsResponseAddress.city(address.getCity());
-                        restaurantDetailsResponseAddress.flatBuildingName(address.getFlatBuilNo());
-                        restaurantDetailsResponseAddress.locality(address.getLocality());
-                        restaurantDetailsResponseAddress.pincode(address.getPincode());
-
-                        final StateEntity state = address.getState();
-                        RestaurantDetailsResponseAddressState restaurantDetailsResponseAddressState = new RestaurantDetailsResponseAddressState();
-                        restaurantDetailsResponseAddressState.stateName(state.getStateName());
-                        restaurantDetailsResponseAddressState.id(UUID.fromString(state.getUuid()));
-                        restaurantDetailsResponseAddress.state(restaurantDetailsResponseAddressState);
-                        restaurantList.address(restaurantDetailsResponseAddress);
-                        return null;
-                    }
-                });
-
+        List<RestaurantList> restaurantLists = new ArrayList<>();
         RestaurantListResponse restaurantListResponse = new RestaurantListResponse();
-        restaurantListResponse.setRestaurants();
-
-        return new ResponseEntity<>(restaurantListResponse, HttpStatus.OK);
+        for (RestaurantEntity restaurantEntity : restaurants) {
+            RestaurantList restaurant = populateRestaurantListObject(restaurantEntity);
+            //Get Category names of that restaurant
+            List<CategoryEntity> categoriesList = categoryService.getCategoriesByRestaurant(restaurantEntity.getUuid());
+            restaurant.setCategories(getCommaSeparatedCategoryName(categoriesList));
+            restaurantLists.add(restaurant);
+        }
+        restaurantListResponse.restaurants(restaurantLists);
+        return new ResponseEntity<RestaurantListResponse>(restaurantListResponse, HttpStatus.OK);
     }
 
     private ResponseEntity<RestaurantDetailsResponse> getRestaurantDetailsResponseEntity(RestaurantEntity restaurantEntity) {

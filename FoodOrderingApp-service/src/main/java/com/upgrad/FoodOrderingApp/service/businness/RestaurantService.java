@@ -96,25 +96,22 @@ public class RestaurantService {
     @Transactional(propagation = Propagation.REQUIRED)
     public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurantEntity, Double customerRating)
             throws InvalidRatingException {
+
         //Checking the validity of customer rating
         if (customerRating == null || !(customerRating >= 1 && customerRating <= 5)) {
             throw new InvalidRatingException("IRE-001", "Restaurant should be in the range of 1 to 5");
         }
 
-        BigDecimal oldRestaurantRating = restaurantEntity.getCustomerRating();
-        Integer oldCustomersRatingCount = restaurantEntity.getNumberOfCustomersRated();
+        double oldRestaurantRating = restaurantEntity.getCustomerRating();
+        Integer oldCustomersRatingCount = restaurantEntity.getNumberCustomersRated();
         //Update number of customer rated
-        restaurantEntity.setNumberOfCustomersRated(oldCustomersRatingCount + 1);
+        restaurantEntity.setNumberCustomersRated(oldCustomersRatingCount + 1);
 
         /**
          * Calculate avg customer rating
          * New Average rating = (Old average Rating * Old count + NewRating)/NewRatingCount
          * **/
-//        Double newCustomerRating = ((oldRestaurantRating * oldCustomersRatingCount) + customerRating) / (oldCustomersRatingCount + 1);
-        BigDecimal inner = oldRestaurantRating.multiply(new BigDecimal(oldCustomersRatingCount)).add(new BigDecimal(customerRating));
-        BigDecimal divider = new BigDecimal(oldCustomersRatingCount).add(new BigDecimal(1));
-        BigDecimal newCustomerRating = inner.divide(divider);
-
+        Double newCustomerRating = ((oldRestaurantRating * oldCustomersRatingCount) + customerRating) / (oldCustomersRatingCount + 1);
         restaurantEntity.setCustomerRating(newCustomerRating);
 
         //Updating restaurant rating
