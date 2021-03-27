@@ -42,7 +42,7 @@ public class RestaurantEntity implements Serializable {
 
     @Column(name = "customer_rating")
     @NotNull
-    private double customerRating;
+    private Double customerRating;
 
     @Column(name = "average_price_for_two")
     @NotNull
@@ -150,11 +150,11 @@ public class RestaurantEntity implements Serializable {
         this.averagePriceForTwo = averagePriceForTwo;
     }
 
-    public double getCustomerRating() {
+    public Double getCustomerRating() {
         return customerRating;
     }
 
-    public void setCustomerRating(double customerRating) {
+    public void setCustomerRating(Double customerRating) {
         this.customerRating = customerRating;
     }
 

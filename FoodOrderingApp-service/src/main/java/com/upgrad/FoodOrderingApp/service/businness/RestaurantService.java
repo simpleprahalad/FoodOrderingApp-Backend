@@ -102,7 +102,7 @@ public class RestaurantService {
             throw new InvalidRatingException("IRE-001", "Restaurant should be in the range of 1 to 5");
         }
 
-        double oldRestaurantRating = restaurantEntity.getCustomerRating();
+        Double oldRestaurantRating = restaurantEntity.getCustomerRating();
         Integer oldCustomersRatingCount = restaurantEntity.getNumberCustomersRated();
         //Update number of customer rated
         restaurantEntity.setNumberCustomersRated(oldCustomersRatingCount + 1);
