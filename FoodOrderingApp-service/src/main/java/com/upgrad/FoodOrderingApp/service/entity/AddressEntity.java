@@ -71,6 +71,20 @@ public class AddressEntity implements Serializable {
     )
     private CustomerEntity customer;
 
+    public AddressEntity() {
+
+    }
+
+    public AddressEntity(String addressId, String s, String someLocality,
+                         String someCity, String s1, StateEntity stateEntity) {
+        this.uuid = addressId;
+        this.flatBuilNo = s;
+        locality = someLocality;
+        city = someCity;
+        pincode = s1;
+        this.state = stateEntity;
+    }
+
     public CustomerEntity getCustomer() {
         return customer;
     }
