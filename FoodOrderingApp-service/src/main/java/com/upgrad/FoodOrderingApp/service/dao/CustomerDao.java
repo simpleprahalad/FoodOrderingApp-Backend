@@ -44,12 +44,21 @@ public class CustomerDao {
         return userAuthTokenEntity;
     }
 
+    /**
+     * @param customerToBeUpdated
+     * @return
+     */
     public CustomerEntity updateCustomer(CustomerEntity customerToBeUpdated) {
         entityManager.merge(customerToBeUpdated);
         return customerToBeUpdated;
     }
 
-    //To get Customer By Uuid if no results return null
+    /**
+     * To get Customer By Uuid if no results return null
+     *
+     * @param uuid
+     * @return
+     */
     public CustomerEntity getCustomerByUuid(final String uuid) {
         try {
             CustomerEntity customer = entityManager.createNamedQuery("customerByUuid",

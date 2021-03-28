@@ -30,6 +30,10 @@ public class CustomerService {
     @Autowired
     PasswordCryptographyProvider passwordCryptographyProvider; //Provides coding and decoding for the password
 
+    /**
+     * @param password
+     * @return
+     */
     private boolean isPasswordWeak(String password) {
         // Regex to check valid password.
         String regex = "^(?=.*[0-9])"
@@ -50,17 +54,30 @@ public class CustomerService {
         return m.matches();
     }
 
+    /**
+     * @param email
+     * @return
+     */
     private boolean isEmailValid(String email) {
         String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
         return email.matches(regex);
     }
 
+    /**
+     * @param contactNumber
+     * @return
+     */
     private boolean isContactNumberValid(String contactNumber) {
         Pattern p = Pattern.compile("\\A[0-9]{10}\\z");
         Matcher m = p.matcher(contactNumber);
         return (m.find() && m.group().equals(contactNumber));
     }
 
+    /**
+     * @param accessToken
+     * @return
+     * @throws AuthorizationFailedException
+     */
     @Transactional
     public CustomerEntity getCustomer(final String accessToken) throws AuthorizationFailedException {
         CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
@@ -86,6 +103,11 @@ public class CustomerService {
         return customerAuthEntity.getCustomer();
     }
 
+    /**
+     * @param customerEntity
+     * @return
+     * @throws SignUpRestrictedException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity saveCustomer(CustomerEntity customerEntity) throws SignUpRestrictedException {
 
@@ -93,7 +115,8 @@ public class CustomerService {
         CustomerEntity existingCustomerEntity = customerDao.getCustomerByContactNumber(customerEntity.getContactnumber());
 
         if (existingCustomerEntity != null) {//Checking if Customer already Exists if yes throws exception.
-            throw new SignUpRestrictedException("SGR-001", "This contact number is already registered! Try other contact number");
+            throw new SignUpRestrictedException("SGR-001",
+                    "This contact number is already registered! Try other contact number");
         }
 
         if (!isEmailValid(customerEntity.getEmail())) {//Checking if email is valid
@@ -151,12 +174,17 @@ public class CustomerService {
         }
     }
 
+    /**
+     * @param accessToken
+     * @return
+     * @throws AuthorizationFailedException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerAuthEntity logout(final String accessToken) throws AuthorizationFailedException {
 
         CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthTokenByAccessToken(accessToken);
 
-        //Paremters are checked as below if the conditions are not satisfied it throws exception.
+        //Parameters are checked as below if the conditions are not satisfied it throws exception.
         if (customerAuthEntity == null) {//Checking if customerAuthEntity exist
             throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
         }
@@ -174,11 +202,15 @@ public class CustomerService {
         //Setting the logout time to now.
         customerAuthEntity.setLogoutAt(ZonedDateTime.now());
 
-        //Calls customerLogout of customerAuthDao to update the CustomerAuthEntity and logsout the customer.
-        CustomerAuthEntity upatedCustomerAuthEntity = customerAuthDao.customerLogout(customerAuthEntity);
-        return upatedCustomerAuthEntity;
+        //Calls customerLogout of customerAuthDao to update the CustomerAuthEntity and logout the customer.
+        CustomerAuthEntity updatedCustomerAuthEntity = customerAuthDao.customerLogout(customerAuthEntity);
+        return updatedCustomerAuthEntity;
     }
 
+    /**
+     * @param customerEntity
+     * @return
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity updateCustomer(CustomerEntity customerEntity) {
         //Calls updateCustomer of customerDao to update the customer data in the DB
@@ -186,6 +218,13 @@ public class CustomerService {
         return updatedCustomer;
     }
 
+    /**
+     * @param oldPassword
+     * @param newPassword
+     * @param customerEntity
+     * @return
+     * @throws UpdateCustomerException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity updateCustomerPassword(
             final String oldPassword,
