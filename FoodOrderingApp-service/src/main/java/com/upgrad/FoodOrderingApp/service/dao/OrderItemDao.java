@@ -13,6 +13,11 @@ public class OrderItemDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     *
+     * @param orderUuid
+     * @return List<OrderItemEntity>
+     */
     public List<OrderItemEntity> getOrderItemsByOrderUuid(final String orderUuid) {
         try {
             return entityManager.createNamedQuery("getItemsByOrderUuid", OrderItemEntity.class)
@@ -23,6 +28,10 @@ public class OrderItemDao {
         }
     }
 
+    /**
+     *
+     * @param orderItemEntity
+     */
     public void saveOrderItem(OrderItemEntity orderItemEntity){
         entityManager.persist(orderItemEntity);
     }
