@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.OrderBy;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -57,6 +58,7 @@ public class CustomerEntity implements Serializable {
     private String salt;
 
     @OneToMany(mappedBy = "customer")
+    @OrderBy(clause = "id desc")
     private List<AddressEntity> addresses;
 
     public List<AddressEntity> getAddresses() {
