@@ -109,7 +109,7 @@ public class OrderService {
      */
     public CouponEntity getCouponByCouponId(final String couponId)
             throws CouponNotFoundException {
-        //
+        //Raises exception if coupon id does not fetch any coupon from database
         CouponEntity coupon = couponDao.getCouponByCouponUuid(couponId);
         if (coupon == null) {
             throw new CouponNotFoundException("CPF-001", "No coupon by this name");
@@ -117,6 +117,11 @@ public class OrderService {
         return coupon;
     }
 
+    /**
+     *
+     * @param orderItemEntity
+     * @return OrderItemEntity after persiting it.
+     */
     @Transactional
     public OrderItemEntity saveOrderItem(OrderItemEntity orderItemEntity) {
         orderItemDao.saveOrderItem(orderItemEntity);
