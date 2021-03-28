@@ -26,6 +26,12 @@ public class ItemService {
     @Autowired
     private OrderItemDao orderItemDao;
 
+    /**
+     * Get items by category and restaurant
+     * @param restaurantUuid
+     * @param categoryUuid
+     * @return List of ItemEntity
+     */
     public List<ItemEntity> getItemsByCategoryAndRestaurant(final String restaurantUuid, final String categoryUuid) {
 
         //Get RestaurantEntity from restaurant id
@@ -46,8 +52,9 @@ public class ItemService {
     }
 
     /**
+     * Get items by UUID
      * @param itemUuid
-     * @return
+     * @return ItemEntity
      * @throws ItemNotFoundException
      */
     public ItemEntity getItemByUuid(final String itemUuid) throws ItemNotFoundException {
@@ -59,8 +66,9 @@ public class ItemService {
     }
 
     /**
+     * Get items by popularity
      * @param restaurantEntity
-     * @return
+     * @return List<ItemEntity>
      */
     public List<ItemEntity> getItemsByPopularity(final RestaurantEntity restaurantEntity) {
         //Get all orders of the given restaurant
@@ -77,24 +85,26 @@ public class ItemService {
             }
         }
 
-        //Get top 5 items id in map
-        itemCountHashMap = getTopCountMap(itemCountHashMap, 5);
+        //Get top 5 item ids in sorted order
+        List<String> listIdKeys = getTopCountMap(itemCountHashMap, 5);
 
         //Populate items from the saved uuid of items
         List<ItemEntity> popularItems = new ArrayList<>();
-        for (String id : itemCountHashMap.keySet()) {
+        for (String id : listIdKeys) {
             popularItems.add(itemDao.getItemByUuid(id));
         }
         return popularItems;
     }
 
     /**
+     * Sort map based on the value and get limited items provided to param
      * @param map
      * @param limit
-     * @return
+     * @return Map<String, Integer>
      */
-    private Map<String, Integer> getTopCountMap(final Map<String, Integer> map, final int limit) {
+    private List<String> getTopCountMap(final Map<String, Integer> map, final int limit) {
         List<Map.Entry<String, Integer>> list = new ArrayList<>(map.entrySet());
+
         // Sorting in decreasing order
         Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
             @Override
@@ -103,16 +113,19 @@ public class ItemService {
             }
         });
 
-        Map<String, Integer> sortedByValueMap = new HashMap<String, Integer>();
+        List<String> sortedItemKeys = new ArrayList<>();
         int index = 1;
+        //Get top 5 items
         for (Map.Entry<String, Integer> item : list) {
+            //Iterate only upto a limit
             if (index <= limit) {
-                sortedByValueMap.put(item.getKey(), item.getValue());
+                sortedItemKeys.add(item.getKey());
                 index++;
             } else {
-                return sortedByValueMap;
+                return sortedItemKeys;
             }
         }
-        return sortedByValueMap;
+
+        return sortedItemKeys;
     }
 }

@@ -21,6 +21,7 @@ public class CategoryService {
     RestaurantDao restaurantDao;
 
     /**
+     * Get all categories order by name
      * @return List of all categories
      */
     public List<CategoryEntity> getAllCategoriesOrderedByName() {
@@ -28,7 +29,7 @@ public class CategoryService {
     }
 
     /**
-     *
+     * Get category details by id
      * @param categoryUuid
      * @return CategoryEntity
      */
@@ -47,13 +48,12 @@ public class CategoryService {
     }
 
     /**
-     *
+     * Get category by restaurant
      * @param restaurantId
      * @return list of category entity of restaurant
      */
     public List<CategoryEntity> getCategoriesByRestaurant(String restaurantId){
         RestaurantEntity restaurantEntity = restaurantDao.getRestaurantByUuid(restaurantId);
-
         return restaurantEntity.getCategories();
     }
 

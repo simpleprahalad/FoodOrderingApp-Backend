@@ -26,6 +26,13 @@ public class CategoryController {
     @Autowired
     ItemService itemService;
 
+    @Autowired
+
+    /**
+     *
+     * Get all categories saved in the database
+     * @Return ResponseEntity of type CategoriesListResponse
+     */
     @RequestMapping(method = RequestMethod.GET,
             value = "/category",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -54,6 +61,12 @@ public class CategoryController {
         return new ResponseEntity<CategoriesListResponse>(categoriesListResponse, HttpStatus.OK);
     }
 
+    /**
+     * Get all categories by category UUId with all related items object
+     * @param categoryId
+     * @return ResponseEntity of type CategoryDetailsResponse
+     * @throws CategoryNotFoundException
+     */
     @RequestMapping(method = RequestMethod.GET,
             value = "/category/{category_id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
