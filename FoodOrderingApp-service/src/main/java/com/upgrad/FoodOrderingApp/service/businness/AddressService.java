@@ -52,10 +52,16 @@ public class AddressService {
     @Transactional(propagation = Propagation.REQUIRED)
     public AddressEntity saveAddress(final CustomerEntity customerEntity, final AddressEntity addressEntity)
             throws SaveAddressException {
-        if (addressEntity.getFlatBuilNo() == null || addressEntity.getLocality() == null ||
-                addressEntity.getCity() == null || addressEntity.getPincode() == null) {
+        String flatBuilNo = addressEntity.getFlatBuilNo();
+        String locality = addressEntity.getLocality();
+        String city = addressEntity.getCity();
+        String pinCode = addressEntity.getPincode();
+        if (flatBuilNo == null || flatBuilNo.isEmpty() ||
+                locality == null || locality.isEmpty() ||
+                city == null || city.isEmpty() ||
+                pinCode == null || pinCode.isEmpty()) {
             throw new SaveAddressException("SAR-001", "No field can be empty");
-        } else if (!isValidPinCode(addressEntity.getPincode())) {
+        } else if (!isValidPinCode(pinCode)) {
             throw new SaveAddressException("SAR-002", "Invalid pincode");
         }
         addressEntity.setCustomer(customerEntity);
@@ -66,6 +72,7 @@ public class AddressService {
      * @param addressEntity
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED)
     public AddressEntity deleteAddress(final AddressEntity addressEntity) {
         return addressDao.deleteAddress(addressEntity);
     }
@@ -78,8 +85,12 @@ public class AddressService {
      * @throws AddressNotFoundException
      */
     public AddressEntity getAddressByUUID(final String addressId, final CustomerEntity customer) throws AuthorizationFailedException, AddressNotFoundException {
-        if (addressId.isEmpty()) {
+        if (addressId == null || addressId.isEmpty()) {
             throw new AddressNotFoundException("ANF-005", "Address id can not be empty");
+        }
+
+        if (null == addressDao.getAddressByUuid(addressId)) {
+            throw new AuthorizationFailedException("ATHR-003", "No address by this id");
         }
 
         final AddressEntity searchedAddress = addressDao.getAddressesByCustomerUuid(customer.getUuid())
@@ -102,7 +113,7 @@ public class AddressService {
     }
 
     /**
-     * @return
+     * @returnNo field should be empty
      */
     public List<StateEntity> getAllStates() {
         return stateDao.getAllStates();
