@@ -14,22 +14,42 @@ public class AddressDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     *
+     * @param address
+     * @return AddressEntity
+     */
     public AddressEntity saveAddress(final AddressEntity address) {
         entityManager.persist(address);
         return address;
     }
 
+    /**
+     *
+     * @param customerUuid
+     * @return List<AddressEntity>
+     */
     public List<AddressEntity> getAddressesByCustomerUuid(final String customerUuid) {
         return entityManager
                 .createNamedQuery("getAddressesByCustomerUuid", AddressEntity.class)
                 .setParameter("customerUuid", customerUuid).getResultList();
     }
 
+    /**
+     *
+     * @param addressEntity
+     * @return AddressEntity
+     */
     public AddressEntity deleteAddress(final AddressEntity addressEntity) {
         entityManager.remove(addressEntity);
         return addressEntity;
     }
 
+    /**
+     *
+     * @param addressId
+     * @return AddressEntity
+     */
     public AddressEntity getAddressByUuid(final String addressId) {
         try {
             return entityManager.createNamedQuery("getAddressByUuid", AddressEntity.class).setParameter("uuid", addressId).getSingleResult();

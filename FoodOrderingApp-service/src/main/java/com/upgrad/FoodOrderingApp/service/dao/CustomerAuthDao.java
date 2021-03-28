@@ -12,6 +12,11 @@ public class CustomerAuthDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     *
+     * @param authorization
+     * @return CustomerAuthEntity
+     */
     public CustomerAuthEntity getCustomerAuthTokenByAccessToken(final String authorization) {
         try {
             return entityManager.createNamedQuery("customerAuthTokenByAccessToken", CustomerAuthEntity.class)
@@ -21,11 +26,21 @@ public class CustomerAuthDao {
         }
     }
 
+    /**
+     *
+     * @param customerAuthEntity
+     * @return CustomerAuthEntity
+     */
     public CustomerAuthEntity createCustomerAuth(CustomerAuthEntity customerAuthEntity) {
         entityManager.persist(customerAuthEntity);
         return customerAuthEntity;
     }
 
+    /**
+     *
+     * @param customerAuthEntity
+     * @return CustomerAuthEntity
+     */
     public CustomerAuthEntity customerLogout(CustomerAuthEntity customerAuthEntity) {
         entityManager.merge(customerAuthEntity);
         return customerAuthEntity;

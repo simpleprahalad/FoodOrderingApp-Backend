@@ -15,6 +15,10 @@ public class PaymentDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     *
+     * @return List<PaymentEntity>
+     */
     public List<PaymentEntity> getAllPaymentMethods() {
         try {
             return entityManager.createNamedQuery("allPayments", PaymentEntity.class).getResultList();
@@ -23,6 +27,11 @@ public class PaymentDao {
         }
     }
 
+    /**
+     *
+     * @param paymentUuid
+     * @return
+     */
     public PaymentEntity getPaymentByUuid(final String paymentUuid) {
         try { return entityManager.createNamedQuery("paymentByUuid", PaymentEntity.class)
                 .setParameter("uuid", paymentUuid).getSingleResult();
