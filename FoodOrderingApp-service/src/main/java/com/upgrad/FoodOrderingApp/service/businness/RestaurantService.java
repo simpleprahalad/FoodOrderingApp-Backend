@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class RestaurantService {
     private CategoryDao categoryDao;
 
     /**
+     * Get restaurant by rating
      * @return List of all restaurants order by rating
      */
     public List<RestaurantEntity> restaurantsByRating() {
@@ -33,6 +35,7 @@ public class RestaurantService {
     }
 
     /**
+     * Get restaurant by name
      * @return List of all restaurants by entered input order by restaurant name
      */
     public List<RestaurantEntity> restaurantsByName(final String restaurantName)
@@ -54,6 +57,7 @@ public class RestaurantService {
     }
 
     /**
+     * Get restaurant by category
      * @return List of all restaurants by category uuid order by restaurant name
      */
     public List<RestaurantEntity> restaurantByCategory(final String categoryUuid)
@@ -73,6 +77,7 @@ public class RestaurantService {
     }
 
     /**
+     * Get restaurant by uuid
      * @return Restaurant by id
      */
     public RestaurantEntity restaurantByUUID(final String restaurantId)
@@ -93,6 +98,13 @@ public class RestaurantService {
         }
     }
 
+    /**
+     * Update restaurant rating
+     * @param restaurantEntity
+     * @param customerRating
+     * @return RestaurantEntity
+     * @throws InvalidRatingException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurantEntity, Double customerRating)
             throws InvalidRatingException {
@@ -107,15 +119,26 @@ public class RestaurantService {
         //Update number of customer rated
         restaurantEntity.setNumberCustomersRated(oldCustomersRatingCount + 1);
 
-        /**
-         * Calculate avg customer rating
-         * New Average rating = (Old average Rating * Old count + NewRating)/NewRatingCount
-         * **/
-        Double newCustomerRating = ((oldRestaurantRating * oldCustomersRatingCount) + customerRating) / (oldCustomersRatingCount + 1);
-        restaurantEntity.setCustomerRating(newCustomerRating);
+        restaurantEntity.setCustomerRating(calculateAvgRating(oldRestaurantRating, customerRating, oldCustomersRatingCount));
 
         //Updating restaurant rating
         RestaurantEntity updatedRestaurantEntity = restaurantDao.updateRestaurantRating(restaurantEntity);
         return updatedRestaurantEntity;
+    }
+
+    /**
+     * Calculate avg customer rating
+     * Formula: New Average rating = (Old average Rating * Old count + NewRating)/NewRatingCount
+     * @param oldRestaurantRating
+     * @param customerRating
+     * @param oldCustomersRatingCount
+     * @return calculated new rating
+     */
+    private Double calculateAvgRating(Double oldRestaurantRating, Double customerRating, Integer oldCustomersRatingCount) {
+        Double newCustomerRating = ((oldRestaurantRating * oldCustomersRatingCount) + customerRating) / (oldCustomersRatingCount + 1);
+        Double truncatedDouble = BigDecimal.valueOf(newCustomerRating)
+                .setScale(1, RoundingMode.FLOOR)
+                .doubleValue();
+        return truncatedDouble;
     }
 }

@@ -37,18 +37,26 @@ public class RestaurantController {
     @Autowired
     CustomerService customerService;
 
+    /**
+     * Get all the restaurants in order of their ratings
+     * @return ResponseEntity of type RestaurantListResponse
+     */
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantListResponse> getAllRestaurants() {
-
         //Get all restaurants order by rating as a list of RestaurantEntity
         List<RestaurantEntity> restaurants = restaurantService.restaurantsByRating();
-
-        //Declare list of RestaurantListResponse
         return getRestaurantListResponseEntity(restaurants);
     }
 
+    /**
+     * Get all the restaurants corresponding to the given name will be returned in alphabetical order of their names.
+     * List of categories should be displayed in a categories string
+     * @param restaurantName
+     * @return ResponseEntity of type RestaurantListResponse
+     * @throws RestaurantNotFoundException
+     */
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant/name/{restaurant_name}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -56,12 +64,15 @@ public class RestaurantController {
             throws RestaurantNotFoundException {
         //Get all restaurants by name order by name as a list of RestaurantEntity
         List<RestaurantEntity> restaurants = restaurantService.restaurantsByName(restaurantName);
-
-        //Declare list of RestaurantListResponse
         return getRestaurantListResponseEntity(restaurants);
     }
 
-
+    /**
+     * Get all the restaurants under given category in alphabetical order
+     * @param categoryId
+     * @return ResponseEntity of type RestaurantListResponse
+     * @throws CategoryNotFoundException
+     */
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant/category/{category_id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -69,11 +80,16 @@ public class RestaurantController {
             throws CategoryNotFoundException {
         //Get all restaurants by category order by name as a list of RestaurantEntity
         List<RestaurantEntity> restaurants = restaurantService.restaurantByCategory(categoryId);
-
-        //Declare list of RestaurantListResponse
         return getRestaurantListResponseEntity(restaurants);
     }
 
+    /**
+     * If the restaurant id entered by the customer matches any restaurant in the database, it should retrieve that restaurant’s details
+     * Result includes category with related items
+     * @param restaurantId
+     * @return ResponseEntity of type RestaurantDetailsResponse
+     * @throws RestaurantNotFoundException
+     */
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant/{restaurant_id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -85,15 +101,19 @@ public class RestaurantController {
         //Declare list of RestaurantListResponse
         RestaurantDetailsResponse restaurantDetails = populateRestaurantDetailsObject(restaurantEntity);
         List<CategoryList> categoriesList = new ArrayList<>();
+        //Fetch all category entity by restaurant id
         List<CategoryEntity> categoriesByRestaurant = categoryService.getCategoriesByRestaurant(restaurantId);
+        //Iterate through categories
         for (CategoryEntity categoryEntity : categoriesByRestaurant) {
             CategoryList categoryList = new CategoryList();
             UUID uuid = UUID.fromString(categoryEntity.getUuid());
             categoryList.setId(uuid);
             categoryList.setCategoryName(categoryEntity.getCategoryName());
+            //Fetch all item entities for given restaurant and with above category
             List<ItemEntity> itemEntities = itemService.getItemsByCategoryAndRestaurant(restaurantId, categoryEntity.getUuid());
             final List<ItemList> itemLists = new ArrayList<>();
             for (ItemEntity item : itemEntities) {
+                //Populate item list object
                 populateItemListObject(itemLists, item);
             }
             categoryList.setItemList(itemLists);
@@ -103,6 +123,17 @@ public class RestaurantController {
         return new ResponseEntity<RestaurantDetailsResponse>(restaurantDetails, HttpStatus.OK);
     }
 
+    /**
+     * If the restaurant id entered by the customer matches any restaurant in the database,
+     * It will update that restaurant’s rating in the database along with the number of customers who have rated it.
+     * @param authorization
+     * @param restaurantUuid
+     * @param customerRating
+     * @return ResponseEntity of type RestaurantUpdatedResponse
+     * @throws AuthorizationFailedException
+     * @throws RestaurantNotFoundException
+     * @throws InvalidRatingException
+     */
     @RequestMapping(method = RequestMethod.PUT,
             path = "/restaurant/{restaurant_id}",
             params = "customer_rating",
@@ -126,6 +157,11 @@ public class RestaurantController {
         return new ResponseEntity<RestaurantUpdatedResponse>(restaurantUpdatedResponse, HttpStatus.OK);
     }
 
+    /**
+     * Populate RestaurantListResponse object
+     * @param restaurants
+     * @return ResponseEntity of type RestaurantListResponse
+     */
     private ResponseEntity<RestaurantListResponse> getRestaurantListResponseEntity(List<RestaurantEntity> restaurants) {
         List<RestaurantList> restaurantLists = new ArrayList<>();
         RestaurantListResponse restaurantListResponse = new RestaurantListResponse();
@@ -140,6 +176,11 @@ public class RestaurantController {
         return new ResponseEntity<RestaurantListResponse>(restaurantListResponse, HttpStatus.OK);
     }
 
+    /**
+     * Populate item list
+     * @param itemLists
+     * @param item
+     */
     static void populateItemListObject(List<ItemList> itemLists, ItemEntity item) {
         ItemList itemList = new ItemList();
         UUID itemUuid = UUID.fromString(item.getUuid());
@@ -150,7 +191,12 @@ public class RestaurantController {
         itemLists.add(itemList);
     }
 
-    static RestaurantList populateRestaurantListObject(RestaurantEntity restaurantEntity) {
+    /**
+     * Populate restaurant list object
+     * @param restaurantEntity
+     * @return RestaurantList
+     */
+    private RestaurantList populateRestaurantListObject(RestaurantEntity restaurantEntity) {
         RestaurantList restaurant = new RestaurantList()
                 .id(UUID.fromString(restaurantEntity.getUuid()))
                 .restaurantName(restaurantEntity.getRestaurantName())
@@ -164,7 +210,12 @@ public class RestaurantController {
         return restaurant;
     }
 
-    static RestaurantDetailsResponse populateRestaurantDetailsObject(RestaurantEntity restaurantEntity) {
+    /**
+     * Populate restaurant details object
+     * @param restaurantEntity
+     * @return RestaurantDetailsResponse
+     */
+    private RestaurantDetailsResponse populateRestaurantDetailsObject(RestaurantEntity restaurantEntity) {
         RestaurantDetailsResponse restaurantDetails = new RestaurantDetailsResponse()
                 .id(UUID.fromString(restaurantEntity.getUuid()))
                 .restaurantName(restaurantEntity.getRestaurantName())
@@ -178,7 +229,12 @@ public class RestaurantController {
         return restaurantDetails;
     }
 
-    static RestaurantDetailsResponseAddress populateAddressObject(AddressEntity addressEntity) {
+    /**
+     * Populate RestaurantDetailsResponseAddress object
+     * @param addressEntity
+     * @return RestaurantDetailsResponseAddress
+     */
+    private RestaurantDetailsResponseAddress populateAddressObject(AddressEntity addressEntity) {
         StateEntity stateEntity = addressEntity.getState();
         RestaurantDetailsResponseAddressState restaurantDetailsResponseAddressState = new RestaurantDetailsResponseAddressState()
                 .stateName(stateEntity.getStateName())
@@ -193,6 +249,11 @@ public class RestaurantController {
         return restaurantDetailsResponseAddress;
     }
 
+    /**
+     * Get comma separated categories
+     * @param categoriesList
+     * @return String
+     */
     private String getCommaSeparatedCategoryName(List<CategoryEntity> categoriesList) {
         List<String> categoryNames = new ArrayList<>();
         categoriesList.forEach(categoryEntity -> {
@@ -201,7 +262,12 @@ public class RestaurantController {
         return String.join(", ", categoryNames);
     }
 
-    static BigDecimal getConvertedRating(double rating) {
+    /**
+     * Get rating from Double to BigDecimal
+     * @param rating
+     * @return BigDecimal rating
+     */
+    private BigDecimal getConvertedRating(double rating) {
         BigDecimal ratingInBigDecimal = BigDecimal.valueOf(rating);
         ratingInBigDecimal = ratingInBigDecimal.setScale(1, BigDecimal.ROUND_UP);
         return ratingInBigDecimal;

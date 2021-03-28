@@ -45,6 +45,7 @@ public class CategoryEntity implements Serializable {
     @ManyToMany
     @JoinTable(name = "restaurant_category", joinColumns = @JoinColumn(name = "category_id"),
             inverseJoinColumns = @JoinColumn(name = "restaurant_id"))
+    @OrderBy("lower(restaurantName) asc")
     private List<RestaurantEntity> restaurants = new LinkedList<>();
 
     public int getId() {
