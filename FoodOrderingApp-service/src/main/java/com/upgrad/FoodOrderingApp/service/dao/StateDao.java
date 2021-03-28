@@ -16,7 +16,7 @@ public class StateDao {
 
     /**
      * @param stateUuid
-     * @return
+     * @return StateEntity
      */
     public StateEntity getStateByUuid(final String stateUuid) {
         try {
@@ -29,7 +29,7 @@ public class StateDao {
     }
 
     /**
-     * @return
+     * @return List<StateEntity>
      */
     public List<StateEntity> getAllStates() {
         try {
