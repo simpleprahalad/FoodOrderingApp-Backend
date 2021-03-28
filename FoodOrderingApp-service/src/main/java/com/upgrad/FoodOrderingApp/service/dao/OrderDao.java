@@ -14,6 +14,11 @@ public class OrderDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     *
+     * @param customerUuid
+     * @return List<OrderEntity>
+     */
     public List<OrderEntity> getAllOrdersOfCustomerByUuid(final String customerUuid) {
         try {
             return entityManager.createNamedQuery("getAllOrdersOfCustomerByUuid", OrderEntity.class).setParameter("customerUuid", customerUuid).getResultList();
@@ -22,6 +27,11 @@ public class OrderDao {
         }
     }
 
+    /**
+     *
+     * @param restaurantUuid
+     * @return List<OrderEntity>
+     */
     public List<OrderEntity> getAllOrdersRestaurantUuid(final String restaurantUuid) {
         try {
             return entityManager.createNamedQuery("getAllOrdersByRestaurantUUid", OrderEntity.class).setParameter("restaurantUuid", restaurantUuid).getResultList();
@@ -30,6 +40,11 @@ public class OrderDao {
         }
     }
 
+    /**
+     *
+     * @param order
+     * @return OrderEntity
+     */
     public OrderEntity saveOrder(OrderEntity order) {
         entityManager.persist(order);
         return order;
