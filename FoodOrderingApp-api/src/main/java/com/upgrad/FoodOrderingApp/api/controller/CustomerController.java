@@ -58,12 +58,18 @@ public class CustomerController {
         return new ResponseEntity<SignupCustomerResponse>(customerResponse, HttpStatus.CREATED);
     }
 
+    /**
+     * @param authorization
+     * @return
+     * @throws AuthenticationFailedException
+     */
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST,
             path = "/customer/login",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LoginResponse> login(@RequestHeader("authorization") final String authorization)
             throws AuthenticationFailedException {
+
         // Basic authentication format validation
         isValidAuthorizationFormat(authorization);
 
@@ -72,7 +78,8 @@ public class CustomerController {
         String decodedAuth = new String(decoded);
         String[] decodedArray = decodedAuth.split(":");
 
-        // Calls CustomerService method authenticate to authenticate the login request. if authenticated it returns CustomerAuthEntity conating the details as required.
+        // Calls CustomerService method authenticate to authenticate the login request.
+        // if authenticated it returns CustomerAuthEntity contacting the details as required.
         CustomerAuthEntity customerAuthEntity = customerService.authenticate(decodedArray[0], decodedArray[1]);
         CustomerEntity customer = customerAuthEntity.getCustomer();
 
@@ -90,6 +97,11 @@ public class CustomerController {
         return new ResponseEntity<LoginResponse>(loginResponse, headers, HttpStatus.OK);
     }
 
+    /**
+     * @param authorization
+     * @return
+     * @throws AuthorizationFailedException
+     */
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST,
             path = "/customer/logout",
@@ -105,6 +117,13 @@ public class CustomerController {
         return new ResponseEntity<LogoutResponse>(logoutResponse, null, HttpStatus.OK);
     }
 
+    /**
+     * @param authorization
+     * @param updateCustomerRequest
+     * @return
+     * @throws UpdateCustomerException
+     * @throws AuthorizationFailedException
+     */
     @CrossOrigin
     @RequestMapping(method = RequestMethod.PUT,
             path = "/customer",
@@ -135,6 +154,13 @@ public class CustomerController {
         return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, null, HttpStatus.OK);
     }
 
+    /**
+     * @param authorization
+     * @param updatePasswordRequest
+     * @return
+     * @throws AuthorizationFailedException
+     * @throws UpdateCustomerException
+     */
     @CrossOrigin
     @RequestMapping(method = RequestMethod.PUT,
             path = "/customer/password",
@@ -174,7 +200,11 @@ public class CustomerController {
         return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, null, HttpStatus.OK);
     }
 
-    //To validate the Authorization format
+    /**
+     * @param authorization
+     * @return
+     * @throws AuthenticationFailedException
+     */
     private boolean isValidAuthorizationFormat(String authorization) throws AuthenticationFailedException {
         try {
             byte[] decoded = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
@@ -188,7 +218,11 @@ public class CustomerController {
         }
     }
 
-
+    /**
+     * @param firstName
+     * @return
+     * @throws UpdateCustomerException
+     */
     private boolean isValidUpdateCustomerRequest(String firstName) throws UpdateCustomerException {
         if (firstName == null || firstName == "") {
             throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
@@ -196,20 +230,29 @@ public class CustomerController {
         return true;
     }
 
-    private boolean isValidSignupRequest(CustomerEntity customerEntity) throws SignUpRestrictedException {
+    /**
+     * @param customerEntity
+     * @return
+     * @throws SignUpRestrictedException
+     */
+    private boolean isValidSignupRequest(CustomerEntity customerEntity)
+            throws SignUpRestrictedException {
         if (customerEntity.getFirstName() == null || customerEntity.getFirstName() == "") {
-            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+            throw new SignUpRestrictedException("SGR-005",
+                    "Except last name all fields should be filled");
         }
         if (customerEntity.getPassword() == null || customerEntity.getPassword() == "") {
-            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+            throw new SignUpRestrictedException("SGR-005",
+                    "Except last name all fields should be filled");
         }
         if (customerEntity.getEmail() == null || customerEntity.getEmail() == "") {
-            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+            throw new SignUpRestrictedException("SGR-005",
+                    "Except last name all fields should be filled");
         }
         if (customerEntity.getContactnumber() == null || customerEntity.getContactnumber() == "") {
-            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+            throw new SignUpRestrictedException("SGR-005",
+                    "Except last name all fields should be filled");
         }
         return true;
     }
-
 }
