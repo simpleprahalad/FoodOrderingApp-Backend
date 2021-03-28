@@ -32,6 +32,14 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
+    /**
+     * @param authorization
+     * @param saveAddressRequest
+     * @return
+     * @throws AuthorizationFailedException
+     * @throws SaveAddressException
+     * @throws AddressNotFoundException
+     */
     @RequestMapping(
             method = RequestMethod.POST,
             value = "/address",
@@ -57,6 +65,11 @@ public class AddressController {
         return new ResponseEntity<>(saveAddressResponse, HttpStatus.CREATED);
     }
 
+    /**
+     * @param authorization
+     * @return
+     * @throws AuthorizationFailedException
+     */
     @RequestMapping(
             method = RequestMethod.GET,
             value = "/address/customer",
@@ -84,6 +97,13 @@ public class AddressController {
         return new ResponseEntity<>(addressListResponse, HttpStatus.OK);
     }
 
+    /**
+     * @param authorization
+     * @param addressId
+     * @return
+     * @throws AuthorizationFailedException
+     * @throws AddressNotFoundException
+     */
     @RequestMapping(
             method = RequestMethod.DELETE,
             value = "/address/{address_id}",
@@ -92,7 +112,7 @@ public class AddressController {
                                                                @PathVariable("address_id") final String addressId)
             throws AuthorizationFailedException, AddressNotFoundException {
         final String accessToken = authorization.split("Bearer ")[1];
-        
+
         CustomerEntity customer = customerService.getCustomer(accessToken);
 
         final AddressEntity addressToBeDeleted = addressService.getAddressByUUID(addressId, customer);
@@ -104,6 +124,9 @@ public class AddressController {
         return new ResponseEntity<>(deleteAddressResponse, HttpStatus.OK);
     }
 
+    /**
+     * @return
+     */
     @RequestMapping(
             method = RequestMethod.GET,
             value = "/states",

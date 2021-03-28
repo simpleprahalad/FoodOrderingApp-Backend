@@ -26,9 +26,12 @@ public class AddressService {
     @Autowired
     private AddressDao addressDao;
 
-    @Autowired
-    private AddressService addressService;
-
+    /**
+     * @param stateUuid
+     * @return
+     * @throws AddressNotFoundException
+     * @throws SaveAddressException
+     */
     public StateEntity getStateByUUID(final String stateUuid) throws AddressNotFoundException, SaveAddressException {
         if (stateUuid == null || stateUuid.isEmpty()) {
             throw new SaveAddressException("SAR-001", "No field can be empty");
@@ -40,25 +43,40 @@ public class AddressService {
         return stateEntity;
     }
 
+    /**
+     * @param customerEntity
+     * @param addressEntity
+     * @return
+     * @throws SaveAddressException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public AddressEntity saveAddress(final CustomerEntity customerEntity, final AddressEntity addressEntity)
             throws SaveAddressException {
         if (addressEntity.getFlatBuilNo() == null || addressEntity.getLocality() == null ||
                 addressEntity.getCity() == null || addressEntity.getPincode() == null) {
             throw new SaveAddressException("SAR-001", "No field can be empty");
-        } else if (!isValidPincode(addressEntity.getPincode())) {
+        } else if (!isValidPinCode(addressEntity.getPincode())) {
             throw new SaveAddressException("SAR-002", "Invalid pincode");
         }
-        
         addressEntity.setCustomer(customerEntity);
-
         return addressDao.saveAddress(addressEntity);
     }
 
+    /**
+     * @param addressEntity
+     * @return
+     */
     public AddressEntity deleteAddress(final AddressEntity addressEntity) {
         return addressDao.deleteAddress(addressEntity);
     }
 
+    /**
+     * @param addressId
+     * @param customer
+     * @return
+     * @throws AuthorizationFailedException
+     * @throws AddressNotFoundException
+     */
     public AddressEntity getAddressByUUID(final String addressId, final CustomerEntity customer) throws AuthorizationFailedException, AddressNotFoundException {
         if (addressId.isEmpty()) {
             throw new AddressNotFoundException("ANF-005", "Address id can not be empty");
@@ -75,21 +93,33 @@ public class AddressService {
         return searchedAddress;
     }
 
-    private boolean isValidPincode(String pincode) {
-        String regexForDigitsOnly = "[0-9]+";
-        Pattern pattern = Pattern.compile(regexForDigitsOnly);
-        Matcher matcher = pattern.matcher(pincode);
-        Boolean isPincodeLengthSix = pincode.length() == 6;
-        Boolean isDigitOnly = matcher.matches();
-
-        return (isDigitOnly && isPincodeLengthSix);
-    }
-
+    /**
+     * @param customerEntity
+     * @return
+     */
     public List<AddressEntity> getAllAddress(final CustomerEntity customerEntity) {
         return customerEntity.getAddresses();
     }
 
+    /**
+     * @return
+     */
     public List<StateEntity> getAllStates() {
         return stateDao.getAllStates();
+    }
+
+    /**
+     * This method checks the strength of pinCode and approve accordingly
+     *
+     * @param pinCode
+     * @return
+     */
+    private boolean isValidPinCode(final String pinCode) {
+        String regexForDigitsOnly = "[0-9]+";
+        Pattern pattern = Pattern.compile(regexForDigitsOnly);
+        Matcher matcher = pattern.matcher(pinCode);
+        Boolean isPinCodeLengthSix = pinCode.length() == 6;
+        Boolean isDigitOnly = matcher.matches();
+        return (isDigitOnly && isPinCodeLengthSix);
     }
 }
