@@ -16,6 +16,9 @@ public class JwtTokenProvider {
 
     private final Algorithm algorithm;
 
+    /**
+     * @param secret
+     */
     public JwtTokenProvider(final String secret) {
         try {
             algorithm = Algorithm.HMAC512(secret);
@@ -24,6 +27,13 @@ public class JwtTokenProvider {
         }
     }
 
+    /**
+     *
+     * @param customerUuid
+     * @param issuedDateTime
+     * @param expiresDateTime
+     * @return String token
+     */
     public String generateToken(final String customerUuid, final ZonedDateTime issuedDateTime, final ZonedDateTime expiresDateTime) {
 
         final Date issuedAt = new Date(issuedDateTime.getLong(ChronoField.INSTANT_SECONDS));

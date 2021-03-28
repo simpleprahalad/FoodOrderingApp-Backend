@@ -59,7 +59,6 @@ public class AddressEntity implements Serializable {
     private Integer active;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "state_id", nullable = false)
     private StateEntity state;
 

@@ -50,6 +50,7 @@ public class OrderController {
      * @throws AuthorizationFailedException
      * @throws CouponNotFoundException
      */
+    @CrossOrigin
     @RequestMapping(
             method = RequestMethod.GET,
             path = "/order/coupon/{coupon_name}",
@@ -88,6 +89,7 @@ public class OrderController {
      * @throws RestaurantNotFoundException
      * @throws ItemNotFoundException
      */
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.POST,
             path = "/order",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
@@ -164,6 +166,7 @@ public class OrderController {
      *  logged-in user with HTTP status OK
      * @throws AuthorizationFailedException
      */
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET,
             path = "/order",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

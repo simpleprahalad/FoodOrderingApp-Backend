@@ -41,6 +41,7 @@ public class RestaurantController {
      * Get all the restaurants in order of their ratings
      * @return ResponseEntity of type RestaurantListResponse
      */
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -57,6 +58,7 @@ public class RestaurantController {
      * @return ResponseEntity of type RestaurantListResponse
      * @throws RestaurantNotFoundException
      */
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant/name/{restaurant_name}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -73,6 +75,7 @@ public class RestaurantController {
      * @return ResponseEntity of type RestaurantListResponse
      * @throws CategoryNotFoundException
      */
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant/category/{category_id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -90,6 +93,7 @@ public class RestaurantController {
      * @return ResponseEntity of type RestaurantDetailsResponse
      * @throws RestaurantNotFoundException
      */
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET,
             value = "/restaurant/{restaurant_id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -134,6 +138,7 @@ public class RestaurantController {
      * @throws RestaurantNotFoundException
      * @throws InvalidRatingException
      */
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.PUT,
             path = "/restaurant/{restaurant_id}",
             params = "customer_rating",

@@ -35,11 +35,12 @@ public class AddressController {
     /**
      * @param authorization
      * @param saveAddressRequest
-     * @return
+     * @return ResponseEntity of type SaveAddressResponse
      * @throws AuthorizationFailedException
      * @throws SaveAddressException
      * @throws AddressNotFoundException
      */
+    @CrossOrigin
     @RequestMapping(
             method = RequestMethod.POST,
             value = "/address",
@@ -69,9 +70,10 @@ public class AddressController {
 
     /**
      * @param authorization
-     * @return
+     * @return ResponseEntity of type AddressListResponse
      * @throws AuthorizationFailedException
      */
+    @CrossOrigin
     @RequestMapping(
             method = RequestMethod.GET,
             value = "/address/customer",
@@ -106,6 +108,7 @@ public class AddressController {
      * @throws AuthorizationFailedException
      * @throws AddressNotFoundException
      */
+    @CrossOrigin
     @RequestMapping(
             method = RequestMethod.DELETE,
             value = "/address/{address_id}",
@@ -127,8 +130,10 @@ public class AddressController {
     }
 
     /**
-     * @return
+     * Get all states
+     * @return ResponseEntity of type StatesListResponse
      */
+    @CrossOrigin
     @RequestMapping(
             method = RequestMethod.GET,
             value = "/states",
