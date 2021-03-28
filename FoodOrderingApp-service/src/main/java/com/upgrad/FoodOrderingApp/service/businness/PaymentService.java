@@ -14,10 +14,20 @@ public class PaymentService {
     @Autowired
     private PaymentDao paymentDao;
 
+    /**
+     *
+     * @return List<PaymentEntity>
+     */
     public List<PaymentEntity> getAllPaymentMethods() {
         return paymentDao.getAllPaymentMethods();
     }
 
+    /**
+     *
+     * @param paymentId
+     * @return PaymentEntity
+     * @throws PaymentMethodNotFoundException
+     */
     public PaymentEntity getPaymentByUUID(final String paymentId) throws PaymentMethodNotFoundException {
         PaymentEntity payment = paymentDao.getPaymentByUuid(paymentId);
         if(payment == null){
