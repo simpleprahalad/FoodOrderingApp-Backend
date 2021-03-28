@@ -26,8 +26,6 @@ public class CategoryController {
     @Autowired
     ItemService itemService;
 
-    @Autowired
-
     /**
      *
      * Get all categories saved in the database
